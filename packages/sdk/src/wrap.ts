@@ -7,12 +7,13 @@ import type {
 } from "@graphos/core";
 import { PolicyViolationError } from "./errors.js";
 
+type StreamResult =
+  | AsyncIterable<Record<string, unknown>>
+  | Promise<AsyncIterable<Record<string, unknown>>>;
+
 export interface GraphLike<TInput = unknown, TOutput = unknown> {
   invoke(input: TInput, config?: unknown): Promise<TOutput>;
-  stream(
-    input: TInput,
-    config?: unknown
-  ): AsyncIterable<Record<string, unknown>>;
+  stream(input: TInput, config?: unknown): StreamResult;
 }
 
 export interface WrapOptions<TState = unknown> {
@@ -47,8 +48,11 @@ export const GraphOS = {
       const ctx: PolicyContext = { sessionId };
       for (const p of policies) p.reset?.(ctx);
 
+      const streamResult = graph.stream(input, config);
+      const iterable = await Promise.resolve(streamResult);
+
       let step = 0;
-      for await (const chunk of graph.stream(input, config)) {
+      for await (const chunk of iterable) {
         for (const [node, state] of Object.entries(chunk)) {
           const execution: NodeExecution<TState> = {
             sessionId,
