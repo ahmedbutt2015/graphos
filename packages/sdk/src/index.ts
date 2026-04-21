@@ -5,6 +5,9 @@ export type { GraphLike, WrapOptions, WrappedGraph } from "./wrap.js";
 export { LoopGuard } from "./policies/loop-guard.js";
 export type { LoopGuardOptions } from "./policies/loop-guard.js";
 
+export { BudgetGuard } from "./policies/budget-guard.js";
+export type { BudgetGuardOptions } from "./policies/budget-guard.js";
+
 export type {
   SessionId,
   NodeId,
