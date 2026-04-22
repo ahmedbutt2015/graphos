@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 import { WebSocketServer } from "ws";
+import { createTraceStore } from "./lib/trace-store.mjs";
 
 const WS_PORT = Number(process.env.GRAPHOS_WS_PORT ?? 4001);
-const MAX_EVENTS_PER_SESSION = 5_000;
-
-const sessions = new Map();
+const store = createTraceStore();
 const clients = new Set();
 
 const broadcast = (message, except) => {
@@ -15,36 +14,14 @@ const broadcast = (message, except) => {
   }
 };
 
-const ingest = (event) => {
-  if (!event || typeof event !== "object" || typeof event.sessionId !== "string") {
-    return;
-  }
-  let bucket = sessions.get(event.sessionId);
-  if (!bucket) {
-    bucket = [];
-    sessions.set(event.sessionId, bucket);
-  }
-  bucket.push(event);
-  if (bucket.length > MAX_EVENTS_PER_SESSION) {
-    bucket.splice(0, bucket.length - MAX_EVENTS_PER_SESSION);
-  }
-};
-
-const snapshot = () => {
-  const out = [];
-  for (const bucket of sessions.values()) {
-    for (const ev of bucket) out.push(ev);
-  }
-  return out;
-};
-
 const wss = new WebSocketServer({ port: WS_PORT, path: "/graphos" });
 
 wss.on("connection", (ws) => {
   clients.add(ws);
 
-  ws.send(JSON.stringify({ kind: "hello", sessions: sessions.size }));
-  for (const event of snapshot()) {
+  const { sessions, events } = store.stats();
+  ws.send(JSON.stringify({ kind: "hello", sessions, events }));
+  for (const event of store.recent()) {
     ws.send(JSON.stringify(event));
   }
 
@@ -56,7 +33,7 @@ wss.on("connection", (ws) => {
     } catch {
       return;
     }
-    ingest(parsed);
+    store.insert(parsed);
     broadcast(text, ws);
   });
 
@@ -66,11 +43,15 @@ wss.on("connection", (ws) => {
 
 wss.on("listening", () => {
   console.log(`[graphos] telemetry ws://localhost:${WS_PORT}/graphos`);
+  console.log(`[graphos] traces db: ${store.path}`);
 });
 
 const shutdown = () => {
   console.log("[graphos] shutting down ws server");
-  wss.close(() => process.exit(0));
+  wss.close(() => {
+    store.close();
+    process.exit(0);
+  });
 };
 process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);

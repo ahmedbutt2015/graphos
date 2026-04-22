@@ -26,7 +26,11 @@ const launch = (cmd, args, label) => {
 
 const next = resolve(here, "node_modules/.bin/next");
 launch(next, ["dev", "-p", "4000"], "next");
-launch(process.execPath, [resolve(here, "ws-server.mjs")], "ws");
+launch(
+  process.execPath,
+  ["--disable-warning=ExperimentalWarning", resolve(here, "ws-server.mjs")],
+  "ws"
+);
 
 const shutdown = () => {
   for (const c of children) c.kill("SIGTERM");
