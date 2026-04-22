@@ -37,6 +37,28 @@ export const createTraceStore = (dbPath = defaultDbPath()) => {
   const recentStmt = db.prepare(
     "SELECT payload FROM events ORDER BY id DESC LIMIT ?"
   );
+  const listSessionsStmt = db.prepare(`
+    SELECT
+      session_id,
+      MIN(ts) AS started_at,
+      MAX(ts) AS ended_at,
+      SUM(CASE WHEN kind = 'step' THEN 1 ELSE 0 END) AS step_count,
+      COUNT(*) AS event_count
+    FROM events
+    GROUP BY session_id
+    ORDER BY started_at DESC
+  `);
+  const lifecycleEventsStmt = db.prepare(`
+    SELECT session_id, kind, payload
+    FROM events
+    WHERE kind IN ('session.start', 'session.end')
+    ORDER BY id ASC
+  `);
+  const sessionEventsStmt = db.prepare(`
+    SELECT payload FROM events
+    WHERE session_id = ?
+    ORDER BY id ASC
+  `);
 
   const insert = (event) => {
     if (!event || typeof event !== "object") return;
@@ -56,7 +78,45 @@ export const createTraceStore = (dbPath = defaultDbPath()) => {
     sessions: Number(distinctSessionsStmt.get().n),
   });
 
+  const listSessions = () => {
+    const lifecycles = new Map();
+    for (const row of lifecycleEventsStmt.all()) {
+      const existing = lifecycles.get(row.session_id) ?? {};
+      const parsed = JSON.parse(row.payload);
+      if (row.kind === "session.start") existing.start = parsed;
+      else if (row.kind === "session.end") existing.end = parsed;
+      lifecycles.set(row.session_id, existing);
+    }
+    return listSessionsStmt.all().map((row) => {
+      const lc = lifecycles.get(row.session_id) ?? {};
+      return {
+        sessionId: row.session_id,
+        projectId: lc.start?.projectId,
+        startedAt: Number(row.started_at),
+        endedAt: lc.end ? Number(row.ended_at) : undefined,
+        outcome: lc.end?.outcome,
+        stepCount: Number(row.step_count),
+        eventCount: Number(row.event_count),
+      };
+    });
+  };
+
+  const sessionEvents = (sessionId) => {
+    if (typeof sessionId !== "string" || sessionId.length === 0) return [];
+    return sessionEventsStmt
+      .all(sessionId)
+      .map((row) => JSON.parse(row.payload));
+  };
+
   const close = () => db.close();
 
-  return { insert, recent, stats, close, path: dbPath };
+  return {
+    insert,
+    recent,
+    stats,
+    listSessions,
+    sessionEvents,
+    close,
+    path: dbPath,
+  };
 };
