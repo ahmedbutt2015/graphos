@@ -10,6 +10,9 @@
     "url": "git+https://github.com/ahmedbutt2015/graphos.git"
   },
   "scripts": {
+    "dev": "pnpm --filter @graphos/dashboard dev",
+    "demo:loop": "pnpm --filter graphos-example-loop-demo start",
+    "demo:budget": "pnpm --filter graphos-example-budget-demo start",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",

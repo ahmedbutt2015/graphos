@@ -45,24 +45,35 @@ A local-first, SQLite-backed Next.js dashboard.
 
 ## 🛠 Installation
 
-```bash
-npm install @graphos/sdk
-```
+> **Pre-alpha:** packages aren't published to npm yet. For now, clone the monorepo and run the bundled examples.
+>
+> Once published:
+> ```bash
+> npm install @graphos/sdk
+> ```
 
 ---
 
 ## 🚀 Quick start
 
-Wrap your existing LangGraph `CompiledGraph` in a few lines.
+Wrap your existing LangGraph `CompiledGraph` and stream live traces to the dashboard.
 
 ```typescript
-import { GraphOS, LoopGuard } from "@graphos/sdk";
+import {
+  GraphOS,
+  LoopGuard,
+  BudgetGuard,
+  createWebSocketTransport,
+} from "@graphos/sdk";
 import { myLangGraphApp } from "./agent";
 
 const managedApp = GraphOS.wrap(myLangGraphApp, {
+  projectId: "my-agent",
   policies: [
     new LoopGuard({ maxRepeats: 3 }),
+    new BudgetGuard({ usdLimit: 2.0, cost: (exec) => estimateCost(exec) }),
   ],
+  onTrace: createWebSocketTransport(),
 });
 
 await managedApp.invoke({
@@ -70,9 +81,23 @@ await managedApp.invoke({
 });
 ```
 
+If a policy trips, `invoke()` rejects with `PolicyViolationError` carrying the offending policy name, reason, and a structured `details` payload.
+
+---
+
+## 🎬 Run the demos
+
+Two terminals — no extra deps.
+
 ```bash
-npx graphos dashboard   # opens live graph UI at http://localhost:4000
+pnpm install
+pnpm dev                # terminal 1: Next on :4000 + WS telemetry on :4001
+pnpm demo:loop          # terminal 2: LoopGuard halts a stuck A↔B graph
+# or
+pnpm demo:budget        # terminal 2: BudgetGuard halts a 4-node pipeline at $0.50
 ```
+
+Open [http://localhost:4000](http://localhost:4000) — nodes glow green as they execute and turn red when a policy halts the run.
 
 ---
 
@@ -91,12 +116,12 @@ GraphOS uses a hybrid sidecar pattern:
 ```text
 graphos/
 ├── packages/
-│   ├── sdk/          # GraphOS.wrap() engine, policies, interceptors
-│   ├── core/         # Shared types (Policy, NodeExecution, PolicyDecision)
-│   ├── dashboard/    # Next.js + React Flow + SQLite (coming)
-│   └── mcp-proxy/    # Middleware for MCP tool calls (beta, roadmap)
-├── examples/         # Reference implementations
-└── docs/             # Integration guides
+│   ├── core/         # Shared types (Policy, NodeExecution, TraceEvent)
+│   ├── sdk/          # GraphOS.wrap(), policies, transports
+│   └── dashboard/    # Next.js 15 + React Flow + WS telemetry server
+└── examples/
+    ├── loop-demo/    # LoopGuard halting a stuck A↔B cycle
+    └── budget-demo/  # BudgetGuard halting a 4-node pipeline on $ cap
 ```
 
 ---
@@ -105,9 +130,12 @@ graphos/
 
 - [x] Core interceptor pattern (LangGraph.js)
 - [x] LoopGuard implementation
-- [ ] BudgetGuard implementation
-- [ ] Real-time WebSocket streaming to dashboard
+- [x] BudgetGuard implementation
+- [x] Real-time WebSocket streaming to dashboard
+- [x] Live graph view with active / halted node states
+- [ ] SQLite persistence for traces
 - [ ] Time-travel debugging (checkpoint jumping)
+- [ ] Session history + switcher in dashboard
 - [ ] MCPGuard + MCP proxy
 - [ ] Python SDK parity
 
