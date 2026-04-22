@@ -133,9 +133,9 @@ graphos/
 - [x] BudgetGuard implementation
 - [x] Real-time WebSocket streaming to dashboard
 - [x] Live graph view with active / halted node states
-- [ ] SQLite persistence for traces
-- [ ] Time-travel debugging (checkpoint jumping)
-- [ ] Session history + switcher in dashboard
+- [x] SQLite persistence for traces
+- [x] Session history + switcher in dashboard
+- [x] Time-travel debugging (event-stream scrubber)
 - [ ] MCPGuard + MCP proxy
 - [ ] Python SDK parity
 
