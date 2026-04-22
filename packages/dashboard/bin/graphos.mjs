@@ -12,7 +12,7 @@ if (subcommand !== "dashboard") {
   process.exit(1);
 }
 
-const child = spawn("pnpm", ["exec", "next", "dev", "-p", "4000"], {
+const child = spawn(process.execPath, [resolve(pkgRoot, "server.mjs")], {
   cwd: pkgRoot,
   stdio: "inherit",
 });
