@@ -8,6 +8,9 @@ export type { LoopGuardOptions } from "./policies/loop-guard.js";
 export { BudgetGuard } from "./policies/budget-guard.js";
 export type { BudgetGuardOptions } from "./policies/budget-guard.js";
 
+export { createWebSocketTransport } from "./transport/websocket.js";
+export type { WebSocketTransportOptions } from "./transport/websocket.js";
+
 export type {
   SessionId,
   NodeId,
