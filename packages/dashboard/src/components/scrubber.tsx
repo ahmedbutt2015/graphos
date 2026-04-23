@@ -31,26 +31,22 @@ export const Scrubber = ({ events, step, setStep }: Props) => {
     setPlaying(false);
   }, []);
 
-  useEffect(() => stop, [stop]);
-
   useEffect(() => {
     if (!playing) return;
     timerRef.current = setInterval(() => {
-      setStep((prev) => {
-        const next = prev + 1;
-        if (next >= total) {
-          stop();
-          return total;
-        }
-        return next;
-      });
+      setStep((prev) => Math.min(prev + 1, total));
     }, 400);
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-      timerRef.current = null;
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     };
-    // setStep reference is stable from caller (React's useState setter)
-  }, [playing, total, stop, setStep]);
+  }, [playing, total, setStep]);
+
+  useEffect(() => {
+    if (playing && step >= total) setPlaying(false);
+  }, [playing, step, total]);
 
   const togglePlay = () => {
     if (playing) {
