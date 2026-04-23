@@ -83,15 +83,46 @@ export const GraphOS = {
       let step = 0;
       let lastStep = 0;
 
+      const baseConfig =
+        typeof config === "object" && config !== null
+          ? (config as Record<string, unknown>)
+          : {};
+      const streamConfig =
+        baseConfig.subgraphs === undefined
+          ? { ...baseConfig, subgraphs: true }
+          : baseConfig;
+
       try {
-        const streamResult = graph.stream(input, config);
+        const streamResult = graph.stream(input, streamConfig);
         const iterable = await Promise.resolve(streamResult);
 
-        for await (const chunk of iterable) {
+        for await (const raw of iterable) {
+          let path: readonly string[] = [];
+          let chunk: Record<string, unknown>;
+          if (
+            Array.isArray(raw) &&
+            raw.length === 2 &&
+            Array.isArray((raw as unknown[])[0])
+          ) {
+            const tuple = raw as unknown as [string[], Record<string, unknown>];
+            path = tuple[0];
+            chunk = tuple[1];
+          } else {
+            chunk = raw as Record<string, unknown>;
+          }
+
+          const subgraphPrefix = path
+            .map((seg) => seg.split(":")[0])
+            .filter((seg): seg is string => !!seg)
+            .join("/");
+
           for (const [node, state] of Object.entries(chunk)) {
+            const qualifiedNode = subgraphPrefix
+              ? (`${subgraphPrefix}/${node}` as NodeId)
+              : (node as NodeId);
             const execution: NodeExecution<TState> = {
               sessionId,
-              node: node as NodeId,
+              node: qualifiedNode,
               state: state as TState,
               step: step++,
               timestamp: Date.now(),
@@ -101,7 +132,7 @@ export const GraphOS = {
             emit<TState>(onTrace, {
               kind: "step",
               sessionId,
-              node: execution.node,
+              node: qualifiedNode,
               state: execution.state,
               step: execution.step,
               timestamp: execution.timestamp,
