@@ -1,12 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { TraceEvent } from "@graphos/core";
 import { useTraceStream } from "@/lib/use-trace-stream";
 import { useSessionsList } from "@/lib/use-sessions-list";
 import { useHistoricalSession } from "@/lib/use-historical-session";
 import { LiveGraph } from "@/components/live-graph";
 import { SessionRail } from "@/components/session-rail";
 import { Scrubber } from "@/components/scrubber";
+import { NodeDetail } from "@/components/node-detail";
+
+const isNodeEvent = (
+  ev: TraceEvent
+): ev is Extract<TraceEvent, { kind: "step" }> => ev.kind === "step";
 
 export default function Home() {
   const { latest, connected, sessions, error } = useTraceStream();
@@ -23,6 +29,33 @@ export default function Home() {
 
   const view = selectedId ? history.view : latest;
   const mode: "live" | "history" = selectedId ? "history" : "live";
+
+  const focusedEvent: TraceEvent | undefined = useMemo(() => {
+    if (mode === "history") {
+      if (history.step <= 0) return undefined;
+      return history.events[history.step - 1];
+    }
+    if (!latest?.events?.length) return undefined;
+    for (let i = latest.events.length - 1; i >= 0; i--) {
+      const ev = latest.events[i];
+      if (ev && (ev.kind === "step" || ev.kind === "policy.halt")) return ev;
+    }
+    return latest.events[latest.events.length - 1];
+  }, [mode, history.step, history.events, latest]);
+
+  const focusedNode =
+    focusedEvent && "node" in focusedEvent ? focusedEvent.node : undefined;
+
+  const handleNodeClick = (node: string) => {
+    if (mode !== "history") return;
+    for (let i = history.events.length - 1; i >= 0; i--) {
+      const ev = history.events[i];
+      if (ev && isNodeEvent(ev) && ev.node === node) {
+        history.setStep(i + 1);
+        return;
+      }
+    }
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -117,22 +150,34 @@ export default function Home() {
               </div>
             )}
 
-            <LiveGraph session={view} />
+            <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_380px] gap-4 items-start">
+              <div className="space-y-4 min-w-0">
+                <LiveGraph
+                  session={view}
+                  focusedNode={focusedNode}
+                  onNodeClick={mode === "history" ? handleNodeClick : undefined}
+                />
 
-            {mode === "history" && history.events.length > 0 && (
-              <Scrubber
-                events={history.events}
-                step={history.step}
-                setStep={history.setStep}
-              />
-            )}
+                {mode === "history" && history.events.length > 0 && (
+                  <Scrubber
+                    events={history.events}
+                    step={history.step}
+                    setStep={history.setStep}
+                  />
+                )}
 
-            {mode === "live" && (
-              <div className="text-xs text-muted">
-                {sessions.size} session{sessions.size === 1 ? "" : "s"} in this
-                store
+                {mode === "live" && (
+                  <div className="text-xs text-muted">
+                    {sessions.size} session{sessions.size === 1 ? "" : "s"} in this
+                    store
+                  </div>
+                )}
               </div>
-            )}
+
+              <div className="min-w-0 xl:sticky xl:top-4 xl:self-start xl:max-h-[calc(100vh-2rem)]">
+                <NodeDetail event={focusedEvent} />
+              </div>
+            </div>
           </section>
         )}
       </main>

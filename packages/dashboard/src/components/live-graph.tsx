@@ -41,7 +41,13 @@ const nodeStyle = (state: "idle" | "active" | "halted"): React.CSSProperties => 
   transition: "all 150ms ease-out",
 });
 
-export const LiveGraph = ({ session }: { session: SessionView }) => {
+interface Props {
+  session: SessionView;
+  focusedNode?: string;
+  onNodeClick?: (node: string) => void;
+}
+
+export const LiveGraph = ({ session, focusedNode, onNodeClick }: Props) => {
   const { nodes, edges } = useMemo(() => {
     const flowNodes: Node[] = session.nodes.map((name, i) => {
       const isHalted = session.haltedNode === name && !!session.outcome;
@@ -49,11 +55,17 @@ export const LiveGraph = ({ session }: { session: SessionView }) => {
         !isHalted &&
         session.activeNode === name &&
         !session.outcome;
+      const isFocused = focusedNode === name;
       return {
         id: name,
         position: { x: i * NODE_SPACING, y: 0 },
         data: { label: name },
-        style: nodeStyle(isHalted ? "halted" : isActive ? "active" : "idle"),
+        style: {
+          ...nodeStyle(isHalted ? "halted" : isActive ? "active" : "idle"),
+          cursor: onNodeClick ? "pointer" : "default",
+          outline: isFocused ? "2px solid #7cc9ff" : "none",
+          outlineOffset: isFocused ? 2 : 0,
+        },
       };
     });
 
@@ -66,7 +78,7 @@ export const LiveGraph = ({ session }: { session: SessionView }) => {
     }));
 
     return { nodes: flowNodes, edges: flowEdges };
-  }, [session]);
+  }, [session, focusedNode, onNodeClick]);
 
   return (
     <div className="h-[60vh] rounded-lg border border-white/10 bg-panel overflow-hidden">
@@ -78,7 +90,8 @@ export const LiveGraph = ({ session }: { session: SessionView }) => {
         proOptions={{ hideAttribution: true }}
         nodesDraggable={false}
         nodesConnectable={false}
-        elementsSelectable={false}
+        elementsSelectable={!!onNodeClick}
+        onNodeClick={(_, node) => onNodeClick?.(node.id)}
       >
         <Background color="#1a1f27" gap={24} />
         <Controls showInteractive={false} />
