@@ -3,139 +3,154 @@
 **The Service Mesh for AI Agents.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-![Status: pre-alpha](https://img.shields.io/badge/status-pre--alpha-orange)
+![Status: v1](https://img.shields.io/badge/status-v1-green)
 
-**GraphOS** is an open-source governance and observability layer for [LangGraph](https://langchain-ai.github.io/langgraph/) and the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/).
+**GraphOS** is an open-source governance and observability layer for [LangGraph.js](https://langchain-ai.github.io/langgraphjs/).
 
-Think of it as **Istio for Agents**. Just as microservices need a service mesh for routing, security, and observability, AI agents need a dedicated layer to prevent infinite loops, enforce budget guardrails, and provide a control plane for complex state machines.
+Wrap your compiled graph in one line, get policy enforcement (loops, budgets) and a local-first live dashboard with time-travel replay. No SaaS, no signup, no telemetry leaving your machine.
 
 ---
 
 ## 🧐 Why GraphOS?
 
-As agents move from demos to production, they become unpredictable.
+As agents move from demos to production, three things bite:
 
-- **Infinite Loops** — an agent gets stuck between two nodes, burning tokens indefinitely.
-- **Shadow Tooling** — agents calling MCP tools they shouldn't have access to.
-- **The "Black Box" Problem** — no way to see what happened inside a 20-step execution until it's finished.
+- **Infinite loops** — the agent ping-pongs between nodes, burning tokens silently.
+- **Runaway cost** — one bad prompt eats your monthly OpenAI budget before you notice.
+- **The black-box problem** — no way to see what happened inside a 20-step run until it's finished.
 
-GraphOS fixes this by wrapping your graph execution with a policy-driven interceptor.
-
----
-
-## ✨ Core Pillars
-
-### 1. Policy Enforcement (the "Guard" layer)
-
-Inject logic into your graph without modifying your nodes.
-
-- **LoopGuard** — detect and break deterministic or semantic cycles (`A → B → A`).
-- **BudgetGuard** — real-time token tracking. Kill the run if it exceeds your USD limit.
-- **MCPGuard** — a firewall for your tools. Only allow specific MCP server calls based on the current graph state.
-
-### 2. Live Observability (the Dashboard)
-
-A local-first, SQLite-backed Next.js dashboard.
-
-- **Live streaming** — watch nodes glow in real-time as the agent traverses the graph.
-- **Time-travel debugger** — click any previous state to see the full context, tool outputs, and LLM reasoning.
-- **Trace persistence** — every run is saved to a local SQLite DB for post-mortem analysis.
+GraphOS fixes this by wrapping your `CompiledGraph` with a policy-driven interceptor and streaming every step to a local dashboard.
 
 ---
 
-## 🛠 Installation
+## ✨ What you get
 
-> **Pre-alpha:** packages aren't published to npm yet. For now, clone the monorepo and run the bundled examples.
->
-> Once published:
-> ```bash
-> npm install @graphos/sdk
-> ```
+### Policy enforcement
+- **`LoopGuard`** — halt when a node revisits with identical state (`mode: "state"`) or simply visits N times (`mode: "node"`, for agents whose state grows on every iteration).
+- **`BudgetGuard`** — kill the run when cumulative cost exceeds your USD ceiling.
+- **`tokenCost()`** — drop-in cost extractor that reads `usage_metadata` off LangChain messages and applies a built-in price table for OpenAI + Anthropic models.
+
+### Local dashboard
+- **Live graph** — nodes glow as the agent traverses; halted nodes flash red.
+- **Per-step detail panel** — click a step or scrub the timeline to see messages, tool calls, token usage, and the policy halt reason.
+- **Session switcher + time-travel** — every run persists to SQLite (`~/.graphos/traces.db`); replay any past session step-by-step.
+
+---
+
+## 🛠 Install
+
+```bash
+npm install @graphos/sdk
+# or
+pnpm add @graphos/sdk
+```
 
 ---
 
 ## 🚀 Quick start
-
-Wrap your existing LangGraph `CompiledGraph` and stream live traces to the dashboard.
 
 ```typescript
 import {
   GraphOS,
   LoopGuard,
   BudgetGuard,
+  tokenCost,
   createWebSocketTransport,
+  PolicyViolationError,
 } from "@graphos/sdk";
 import { myLangGraphApp } from "./agent";
 
-const managedApp = GraphOS.wrap(myLangGraphApp, {
+const managed = GraphOS.wrap(myLangGraphApp, {
   projectId: "my-agent",
   policies: [
-    new LoopGuard({ maxRepeats: 3 }),
-    new BudgetGuard({ usdLimit: 2.0, cost: (exec) => estimateCost(exec) }),
+    new LoopGuard({ mode: "node", maxRepeats: 10 }),
+    new BudgetGuard({ usdLimit: 2.0, cost: tokenCost() }),
   ],
   onTrace: createWebSocketTransport(),
 });
 
-await managedApp.invoke({
-  messages: [{ role: "user", content: "Analyze the market." }],
-});
+try {
+  const result = await managed.invoke({
+    messages: [{ role: "user", content: "Analyze the market." }],
+  });
+  console.log(result);
+} catch (err) {
+  if (err instanceof PolicyViolationError) {
+    console.log(`halted by ${err.policy}: ${err.reason}`);
+  } else {
+    throw err;
+  }
+}
 ```
 
-If a policy trips, `invoke()` rejects with `PolicyViolationError` carrying the offending policy name, reason, and a structured `details` payload.
+`invoke()` returns the merged final state. `stream()` is also available if you want to consume per-step updates yourself.
 
 ---
 
-## 🎬 Run the demos
+## 🖥 Run the dashboard
 
-Two terminals — no extra deps.
+```bash
+npx @graphos/dashboard graphos dashboard
+```
+
+Open [http://localhost:4000](http://localhost:4000). Run anything that calls `createWebSocketTransport()` and watch the graph execute live.
+
+The dashboard persists every event to `~/.graphos/traces.db`. By default it keeps the 200 most-recent sessions and prunes older ones; tune via `GRAPHOS_RETENTION_SESSIONS`.
+
+---
+
+## 📦 Packages
+
+| Package | What it does |
+|---|---|
+| [`@graphos/core`](./packages/core) | Shared types (`Policy`, `NodeExecution`, `TraceEvent`) |
+| [`@graphos/sdk`](./packages/sdk) | `GraphOS.wrap()`, `LoopGuard`, `BudgetGuard`, `tokenCost`, transports |
+| [`@graphos/dashboard`](./packages/dashboard) | Next.js + React Flow dashboard with `graphos` CLI |
+
+---
+
+## 🏗 Architecture
+
+```
+your code                                ┌───────────────────────────┐
+   │                                     │   @graphos/dashboard      │
+   ▼                                     │                           │
+┌───────────────┐    onTrace             │  • Next.js + React Flow   │
+│ @graphos/sdk  │ ────WebSocket────────► │  • SQLite (~/.graphos/)   │
+│ GraphOS.wrap()│                        │  • Time-travel scrubber   │
+└───────┬───────┘                        │  • Per-step detail panel  │
+        │ stream()                       └───────────────────────────┘
+        ▼
+   compiled LangGraph
+```
+
+The SDK runs in your process — zero network calls unless you point a transport at one. The dashboard is a separate local process started with `graphos dashboard`.
+
+---
+
+## 🧪 Run the demos from the monorepo
 
 ```bash
 pnpm install
-pnpm dev                # terminal 1: Next on :4000 + WS telemetry on :4001
-pnpm demo:loop          # terminal 2: LoopGuard halts a stuck A↔B graph
-# or
-pnpm demo:budget        # terminal 2: BudgetGuard halts a 4-node pipeline at $0.50
+pnpm dev                # dashboard + WS telemetry
+pnpm demo:loop          # LoopGuard halts an A↔B cycle
+pnpm demo:budget        # BudgetGuard halts a 4-node pipeline
 ```
 
-Open [http://localhost:4000](http://localhost:4000) — nodes glow green as they execute and turn red when a policy halts the run.
-
----
-
-## 🏗 Architecture: the hybrid sidecar
-
-GraphOS uses a hybrid sidecar pattern:
-
-1. **The SDK** — a lightweight wrapper around the LangGraph runtime. Emits events to the control plane over WebSockets (live) and HTTP (batch).
-2. **The Control Plane** — a local server that aggregates traces, enforces cross-run policies, and serves the UI.
-3. **The Storage** — a local-first SQLite instance, so your data never leaves your machine.
-
----
-
-## 📂 Project structure
-
-```text
-graphos/
-├── packages/
-│   ├── core/         # Shared types (Policy, NodeExecution, TraceEvent)
-│   ├── sdk/          # GraphOS.wrap(), policies, transports
-│   └── dashboard/    # Next.js 15 + React Flow + WS telemetry server
-└── examples/
-    ├── loop-demo/    # LoopGuard halting a stuck A↔B cycle
-    └── budget-demo/  # BudgetGuard halting a 4-node pipeline on $ cap
-```
+Open [http://localhost:4000](http://localhost:4000).
 
 ---
 
 ## 🗺 Roadmap
 
-- [x] Core interceptor pattern (LangGraph.js)
-- [x] LoopGuard implementation
-- [x] BudgetGuard implementation
-- [x] Real-time WebSocket streaming to dashboard
+- [x] LoopGuard (state + node modes)
+- [x] BudgetGuard + `tokenCost()` price-table cost extractor
+- [x] WebSocket telemetry transport
 - [x] Live graph view with active / halted node states
-- [x] SQLite persistence for traces
-- [x] Session history + switcher in dashboard
-- [x] Time-travel debugging (event-stream scrubber)
+- [x] SQLite persistence + retention
+- [x] Session switcher + time-travel scrubber
+- [x] Per-step detail panel (messages, tool calls, usage)
+- [x] `graphos dashboard` CLI
 - [ ] MCPGuard + MCP proxy
 - [ ] Python SDK parity
 
@@ -143,8 +158,8 @@ graphos/
 
 ## 🤝 Contributing
 
-We're in **pre-alpha**. If you have 7+ years in web architecture or are going deep on AI agents, we'd love your help building the infrastructure layer for the agentic web.
+Bug reports and PRs welcome at [github.com/ahmedbutt2015/graphos](https://github.com/ahmedbutt2015/graphos/issues).
 
 ## License
 
-MIT
+MIT — © Ahmed Butt
