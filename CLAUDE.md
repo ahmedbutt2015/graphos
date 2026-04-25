@@ -32,7 +32,7 @@ User knows these deeply — don't explain, just use:
 ## Conventions
 - TypeScript strict mode, `noUncheckedIndexedAccess` on.
 - Test with `vitest`.
-- Public package names: `@graphos/core`, `@graphos/sdk`, `@graphos/dashboard`.
+- Public package names: `@graphos-io/core`, `@graphos-io/sdk`, `@graphos-io/dashboard`.
 - Target Node >= 20.
 - Use `NodeNext` module resolution.
 

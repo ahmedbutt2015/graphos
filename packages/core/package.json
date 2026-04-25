@@ -1,5 +1,5 @@
 {
-  "name": "@graphos/core",
+  "name": "@graphos-io/core",
   "version": "1.0.0",
   "description": "Shared types for GraphOS — policies, traces, node state",
   "license": "MIT",

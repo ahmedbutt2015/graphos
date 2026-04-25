@@ -4,7 +4,7 @@ import {
   LoopGuard,
   PolicyViolationError,
   createWebSocketTransport,
-} from "@graphos/sdk";
+} from "@graphos-io/sdk";
 
 const State = Annotation.Root({
   ticks: Annotation<number>({
@@ -36,7 +36,7 @@ const managed = GraphOS.wrap(stuckGraph, {
 });
 
 console.log("▶︎  running stuck graph with GraphOS LoopGuard...");
-console.log("   (dashboard: http://localhost:4000 — start with `pnpm --filter @graphos/dashboard dev`)");
+console.log("   (dashboard: http://localhost:4000 — start with `pnpm --filter @graphos-io/dashboard dev`)");
 
 try {
   await managed.invoke({ ticks: 0 });

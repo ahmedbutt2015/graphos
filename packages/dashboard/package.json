@@ -1,5 +1,5 @@
 {
-  "name": "@graphos/dashboard",
+  "name": "@graphos-io/dashboard",
   "version": "1.0.0",
   "description": "GraphOS local dashboard — live LangGraph visualization and trace explorer",
   "license": "MIT",
@@ -53,7 +53,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@graphos/core": "workspace:*",
+    "@graphos-io/core": "workspace:*",
     "@xyflow/react": "^12.3.5",
     "next": "^15.0.3",
     "react": "^19.0.0",

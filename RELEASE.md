@@ -46,13 +46,13 @@ Why `pnpm publish` (not `npm publish`):
 # In a scratch dir
 mkdir /tmp/graphos-smoke && cd /tmp/graphos-smoke
 npm init -y
-npm install @graphos/sdk
+npm install @graphos-io/sdk
 
 # Should print "1.0.0"
-node -e "console.log(require('@graphos/sdk/package.json').version)"
+node -e "console.log(require('@graphos-io/sdk/package.json').version)"
 
 # Run the dashboard from a fresh install
-npx @graphos/dashboard graphos dashboard
+npx @graphos-io/dashboard graphos dashboard
 # open http://localhost:4000
 ```
 
@@ -73,7 +73,7 @@ Bump the version in the affected package(s), update CHANGELOG.md, and re-run the
 ## Unpublish (within 72h)
 
 ```bash
-npm unpublish @graphos/dashboard@1.0.0
+npm unpublish @graphos-io/dashboard@1.0.0
 ```
 
-After 72 hours, npm refuses unpublish for the version (you can deprecate it instead with `npm deprecate @graphos/dashboard@1.0.0 "use 1.0.1 instead"`).
+After 72 hours, npm refuses unpublish for the version (you can deprecate it instead with `npm deprecate @graphos-io/dashboard@1.0.0 "use 1.0.1 instead"`).

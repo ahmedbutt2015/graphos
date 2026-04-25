@@ -40,9 +40,9 @@ GraphOS fixes this by wrapping your `CompiledGraph` with a policy-driven interce
 ## 🛠 Install
 
 ```bash
-npm install @graphos/sdk
+npm install @graphos-io/sdk
 # or
-pnpm add @graphos/sdk
+pnpm add @graphos-io/sdk
 ```
 
 ---
@@ -57,7 +57,7 @@ import {
   tokenCost,
   createWebSocketTransport,
   PolicyViolationError,
-} from "@graphos/sdk";
+} from "@graphos-io/sdk";
 import { myLangGraphApp } from "./agent";
 
 const managed = GraphOS.wrap(myLangGraphApp, {
@@ -90,7 +90,7 @@ try {
 ## 🖥 Run the dashboard
 
 ```bash
-npx @graphos/dashboard graphos dashboard
+npx @graphos-io/dashboard graphos dashboard
 ```
 
 Open [http://localhost:4000](http://localhost:4000). Run anything that calls `createWebSocketTransport()` and watch the graph execute live.
@@ -103,9 +103,9 @@ The dashboard persists every event to `~/.graphos/traces.db`. By default it keep
 
 | Package | What it does |
 |---|---|
-| [`@graphos/core`](./packages/core) | Shared types (`Policy`, `NodeExecution`, `TraceEvent`) |
-| [`@graphos/sdk`](./packages/sdk) | `GraphOS.wrap()`, `LoopGuard`, `BudgetGuard`, `tokenCost`, transports |
-| [`@graphos/dashboard`](./packages/dashboard) | Next.js + React Flow dashboard with `graphos` CLI |
+| [`@graphos-io/core`](./packages/core) | Shared types (`Policy`, `NodeExecution`, `TraceEvent`) |
+| [`@graphos-io/sdk`](./packages/sdk) | `GraphOS.wrap()`, `LoopGuard`, `BudgetGuard`, `tokenCost`, transports |
+| [`@graphos-io/dashboard`](./packages/dashboard) | Next.js + React Flow dashboard with `graphos` CLI |
 
 ---
 
@@ -113,10 +113,10 @@ The dashboard persists every event to `~/.graphos/traces.db`. By default it keep
 
 ```
 your code                                ┌───────────────────────────┐
-   │                                     │   @graphos/dashboard      │
+   │                                     │   @graphos-io/dashboard      │
    ▼                                     │                           │
 ┌───────────────┐    onTrace             │  • Next.js + React Flow   │
-│ @graphos/sdk  │ ────WebSocket────────► │  • SQLite (~/.graphos/)   │
+│ @graphos-io/sdk  │ ────WebSocket────────► │  • SQLite (~/.graphos/)   │
 │ GraphOS.wrap()│                        │  • Time-travel scrubber   │
 └───────┬───────┘                        │  • Per-step detail panel  │
         │ stream()                       └───────────────────────────┘

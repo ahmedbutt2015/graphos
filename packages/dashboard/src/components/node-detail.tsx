@@ -1,6 +1,6 @@
 "use client";
 
-import type { TraceEvent } from "@graphos/core";
+import type { TraceEvent } from "@graphos-io/core";
 
 interface Props {
   event?: TraceEvent;

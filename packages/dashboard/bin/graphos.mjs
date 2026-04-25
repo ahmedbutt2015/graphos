@@ -48,7 +48,7 @@ const nextEntry =
 
 if (!nextEntry) {
   process.stderr.write(
-    "graphos: cannot find the next binary. Reinstall @graphos/dashboard.\n"
+    "graphos: cannot find the next binary. Reinstall @graphos-io/dashboard.\n"
   );
   process.exit(1);
 }

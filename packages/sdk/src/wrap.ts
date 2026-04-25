@@ -6,7 +6,7 @@ import type {
   SessionId,
   TraceEvent,
   TraceListener,
-} from "@graphos/core";
+} from "@graphos-io/core";
 import { PolicyViolationError } from "./errors.js";
 
 type StreamResult =

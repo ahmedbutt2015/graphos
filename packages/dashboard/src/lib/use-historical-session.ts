@@ -1,7 +1,7 @@
 "use client";
 
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react";
-import type { TraceEvent } from "@graphos/core";
+import type { TraceEvent } from "@graphos-io/core";
 import { buildSessionView, type SessionView } from "./session-view";
 
 interface State {

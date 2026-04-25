@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import type { Policy, TraceEvent } from "@graphos/core";
-import { halt, cont } from "@graphos/core";
+import type { Policy, TraceEvent } from "@graphos-io/core";
+import { halt, cont } from "@graphos-io/core";
 import { GraphOS, type GraphLike } from "./wrap.js";
 import { PolicyViolationError } from "./errors.js";
 

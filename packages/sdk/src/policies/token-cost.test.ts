@@ -4,7 +4,7 @@ import type {
   NodeId,
   PolicyContext,
   SessionId,
-} from "@graphos/core";
+} from "@graphos-io/core";
 import { tokenCost, DEFAULT_PRICES } from "./token-cost.js";
 
 const ctx: PolicyContext = { sessionId: "s1" as SessionId };

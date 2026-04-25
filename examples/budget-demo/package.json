@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@graphos/sdk": "workspace:*",
+    "@graphos-io/sdk": "workspace:*",
     "@langchain/core": "^0.3.0",
     "@langchain/langgraph": "^0.2.0"
   },

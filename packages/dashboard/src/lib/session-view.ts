@@ -1,4 +1,4 @@
-import type { TraceEvent } from "@graphos/core";
+import type { TraceEvent } from "@graphos-io/core";
 
 export interface SessionView {
   sessionId: string;

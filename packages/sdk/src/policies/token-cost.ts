@@ -1,4 +1,4 @@
-import type { NodeExecution } from "@graphos/core";
+import type { NodeExecution } from "@graphos-io/core";
 
 export interface PriceEntry {
   input: number;

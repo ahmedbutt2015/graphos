@@ -1,5 +1,5 @@
 {
-  "name": "@graphos/sdk",
+  "name": "@graphos-io/sdk",
   "version": "1.0.0",
   "description": "GraphOS SDK — wrap your LangGraph app with policy enforcement and live telemetry",
   "license": "MIT",
@@ -51,7 +51,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@graphos/core": "workspace:*",
+    "@graphos-io/core": "workspace:*",
     "ws": "^8.18.0"
   },
   "devDependencies": {

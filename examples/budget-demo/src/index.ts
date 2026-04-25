@@ -4,7 +4,7 @@ import {
   BudgetGuard,
   PolicyViolationError,
   createWebSocketTransport,
-} from "@graphos/sdk";
+} from "@graphos-io/sdk";
 
 const State = Annotation.Root({
   turn: Annotation<number>({
@@ -65,7 +65,7 @@ const managed = GraphOS.wrap(pricyGraph, {
 
 console.log("▶︎  running pricey graph with GraphOS BudgetGuard (limit $0.50)...");
 console.log(
-  "   (dashboard: http://localhost:4000 — start with `pnpm --filter @graphos/dashboard dev`)"
+  "   (dashboard: http://localhost:4000 — start with `pnpm --filter @graphos-io/dashboard dev`)"
 );
 
 try {

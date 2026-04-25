@@ -4,7 +4,7 @@ import type {
   NodeId,
   PolicyContext,
   SessionId,
-} from "@graphos/core";
+} from "@graphos-io/core";
 import { LoopGuard } from "./loop-guard.js";
 
 const ctx: PolicyContext = { sessionId: "s1" as SessionId };

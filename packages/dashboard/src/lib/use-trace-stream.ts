@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { TraceEvent } from "@graphos/core";
+import type { TraceEvent } from "@graphos-io/core";
 import { emptySession, reduceSession, type SessionView } from "./session-view";
 
 export type { SessionView } from "./session-view";

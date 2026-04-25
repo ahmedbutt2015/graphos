@@ -1,15 +1,15 @@
-# @graphos/dashboard
+# @graphos-io/dashboard
 
-Local-first live dashboard for LangGraph.js agents wrapped with [`@graphos/sdk`](https://www.npmjs.com/package/@graphos/sdk).
+Local-first live dashboard for LangGraph.js agents wrapped with [`@graphos-io/sdk`](https://www.npmjs.com/package/@graphos-io/sdk).
 
 ```bash
-npx @graphos/dashboard graphos dashboard
+npx @graphos-io/dashboard graphos dashboard
 ```
 
 Or install globally:
 
 ```bash
-npm install -g @graphos/dashboard
+npm install -g @graphos-io/dashboard
 graphos dashboard
 ```
 

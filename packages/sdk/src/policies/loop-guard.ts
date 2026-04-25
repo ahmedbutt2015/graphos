@@ -3,8 +3,8 @@ import type {
   Policy,
   PolicyContext,
   PolicyDecision,
-} from "@graphos/core";
-import { cont, halt } from "@graphos/core";
+} from "@graphos-io/core";
+import { cont, halt } from "@graphos-io/core";
 
 export type LoopGuardMode = "state" | "node";
 

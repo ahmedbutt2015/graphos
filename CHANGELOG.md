@@ -2,7 +2,7 @@
 
 ## 1.0.0 — 2026-04-25
 
-First public release. Three packages: `@graphos/core`, `@graphos/sdk`, `@graphos/dashboard`.
+First public release. Three packages: `@graphos-io/core`, `@graphos-io/sdk`, `@graphos-io/dashboard`.
 
 ### SDK
 - `GraphOS.wrap(graph, options)` — wrap any LangGraph.js compiled graph with policies + telemetry. Streams with `subgraphs: true` by default and unpacks tuple chunks so subgraph steps surface as qualified node names (e.g. `response_agent/llm_call`).
@@ -16,7 +16,7 @@ First public release. Three packages: `@graphos/core`, `@graphos/sdk`, `@graphos
 - `PolicyViolationError` — typed throw when a policy halts.
 
 ### Dashboard
-- `graphos dashboard` CLI (`npx @graphos/dashboard graphos dashboard`).
+- `graphos dashboard` CLI (`npx @graphos-io/dashboard graphos dashboard`).
 - Live React Flow graph with node-state highlighting (active / halted / focused).
 - Time-travel scrubber over historical sessions.
 - Per-step detail panel: LangChain messages with role, content, tool calls, model, and token usage. Renders policy halt details (reason + structured payload) and session start/end payloads.

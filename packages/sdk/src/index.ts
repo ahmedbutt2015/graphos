@@ -25,4 +25,4 @@ export type {
   Policy,
   PolicyDecision,
   PolicyContext,
-} from "@graphos/core";
+} from "@graphos-io/core";

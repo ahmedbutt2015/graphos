@@ -1,9 +1,9 @@
-# @graphos/core
+# @graphos-io/core
 
-Shared types for [`@graphos/sdk`](https://www.npmjs.com/package/@graphos/sdk) and [`@graphos/dashboard`](https://www.npmjs.com/package/@graphos/dashboard).
+Shared types for [`@graphos-io/sdk`](https://www.npmjs.com/package/@graphos-io/sdk) and [`@graphos-io/dashboard`](https://www.npmjs.com/package/@graphos-io/dashboard).
 
 ```bash
-npm install @graphos/core
+npm install @graphos-io/core
 ```
 
 You usually don't depend on this directly — it's pulled in by the SDK. Install it explicitly only if you're writing your own policy or transport.
@@ -21,7 +21,7 @@ You usually don't depend on this directly — it's pulled in by the SDK. Install
 ## Writing a custom policy
 
 ```typescript
-import { type Policy, cont, halt } from "@graphos/core";
+import { type Policy, cont, halt } from "@graphos-io/core";
 
 class FirstStepGate implements Policy {
   readonly name = "FirstStepGate";

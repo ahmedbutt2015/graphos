@@ -1,9 +1,9 @@
-# @graphos/sdk
+# @graphos-io/sdk
 
 Wrap any LangGraph.js compiled graph with policy enforcement and live telemetry.
 
 ```bash
-npm install @graphos/sdk
+npm install @graphos-io/sdk
 ```
 
 ## Quick start
@@ -16,7 +16,7 @@ import {
   tokenCost,
   createWebSocketTransport,
   PolicyViolationError,
-} from "@graphos/sdk";
+} from "@graphos-io/sdk";
 import { myCompiledGraph } from "./agent";
 
 const managed = GraphOS.wrap(myCompiledGraph, {
@@ -82,7 +82,7 @@ For a custom model, pass `{ prices: { "my-model": { input: 1, output: 2 } } }` (
 createWebSocketTransport({ url?: string, reconnectMs?: number })
 ```
 
-Default URL is `ws://localhost:4001/graphos`. Pass it as `onTrace` and start the dashboard with `npx @graphos/dashboard graphos dashboard`.
+Default URL is `ws://localhost:4001/graphos`. Pass it as `onTrace` and start the dashboard with `npx @graphos-io/dashboard graphos dashboard`.
 
 You can pass any `(event) => void | Promise<void>` as `onTrace` if you'd rather log events somewhere else.
 

@@ -14,7 +14,7 @@ importers:
 
   examples/budget-demo:
     dependencies:
-      '@graphos/sdk':
+      '@graphos-io/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
       '@langchain/core':
@@ -36,7 +36,7 @@ importers:
 
   examples/loop-demo:
     dependencies:
-      '@graphos/sdk':
+      '@graphos-io/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
       '@langchain/core':
@@ -64,7 +64,7 @@ importers:
 
   packages/dashboard:
     dependencies:
-      '@graphos/core':
+      '@graphos-io/core':
         specifier: workspace:*
         version: link:../core
       '@xyflow/react':
@@ -110,7 +110,7 @@ importers:
 
   packages/sdk:
     dependencies:
-      '@graphos/core':
+      '@graphos-io/core':
         specifier: workspace:*
         version: link:../core
       ws:

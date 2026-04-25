@@ -1,5 +1,5 @@
 import WebSocket from "ws";
-import type { TraceListener } from "@graphos/core";
+import type { TraceListener } from "@graphos-io/core";
 
 export interface WebSocketTransportOptions {
   url?: string;

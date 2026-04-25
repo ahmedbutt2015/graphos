@@ -1,4 +1,4 @@
-import type { PolicyDecision } from "@graphos/core";
+import type { PolicyDecision } from "@graphos-io/core";
 
 type HaltDecision = Extract<PolicyDecision, { kind: "halt" }>;
 
