@@ -1,6 +1,6 @@
 {
   "name": "graphos",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Service mesh for AI agents — observability, policy enforcement, and live visualization for LangGraph",
   "license": "MIT",

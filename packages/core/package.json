@@ -1,9 +1,24 @@
 {
   "name": "@graphos/core",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Shared types for GraphOS — policies, traces, node state",
   "license": "MIT",
   "author": "Ahmed Butt",
+  "homepage": "https://github.com/ahmedbutt2015/graphos#readme",
+  "bugs": "https://github.com/ahmedbutt2015/graphos/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahmedbutt2015/graphos.git",
+    "directory": "packages/core"
+  },
+  "keywords": [
+    "langgraph",
+    "agents",
+    "observability",
+    "policies",
+    "graphos",
+    "ai"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -15,12 +30,20 @@
   },
   "files": [
     "dist",
-    "src"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm run clean && pnpm run build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "devDependencies": {
     "typescript": "^5.6.3"

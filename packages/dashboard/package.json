@@ -1,20 +1,56 @@
 {
   "name": "@graphos/dashboard",
-  "version": "0.0.0",
-  "private": true,
+  "version": "1.0.0",
   "description": "GraphOS local dashboard — live LangGraph visualization and trace explorer",
   "license": "MIT",
   "author": "Ahmed Butt",
+  "homepage": "https://github.com/ahmedbutt2015/graphos#readme",
+  "bugs": "https://github.com/ahmedbutt2015/graphos/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahmedbutt2015/graphos.git",
+    "directory": "packages/dashboard"
+  },
+  "keywords": [
+    "langgraph",
+    "dashboard",
+    "observability",
+    "graphos",
+    "ai"
+  ],
   "bin": {
     "graphos": "./bin/graphos.mjs"
   },
+  "files": [
+    "bin",
+    "lib",
+    "src",
+    "public",
+    ".next",
+    "next.config.mjs",
+    "next-env.d.ts",
+    "postcss.config.mjs",
+    "tailwind.config.ts",
+    "tsconfig.json",
+    "ws-server.mjs",
+    "server.mjs",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "node server.mjs",
     "dev:next": "next dev -p 4000",
     "dev:ws": "node ws-server.mjs",
     "build": "next build",
-    "start": "next start -p 4000",
-    "typecheck": "tsc --noEmit"
+    "start": "node bin/graphos.mjs dashboard",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm run build && rm -rf .next/cache"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "dependencies": {
     "@graphos/core": "workspace:*",

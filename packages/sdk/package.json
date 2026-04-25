@@ -1,9 +1,27 @@
 {
   "name": "@graphos/sdk",
-  "version": "0.0.0",
-  "description": "GraphOS SDK — wrap your LangGraph app with policy enforcement and telemetry",
+  "version": "1.0.0",
+  "description": "GraphOS SDK — wrap your LangGraph app with policy enforcement and live telemetry",
   "license": "MIT",
   "author": "Ahmed Butt",
+  "homepage": "https://github.com/ahmedbutt2015/graphos#readme",
+  "bugs": "https://github.com/ahmedbutt2015/graphos/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahmedbutt2015/graphos.git",
+    "directory": "packages/sdk"
+  },
+  "keywords": [
+    "langgraph",
+    "agents",
+    "observability",
+    "policies",
+    "loop-guard",
+    "budget-guard",
+    "telemetry",
+    "graphos",
+    "ai"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -15,14 +33,22 @@
   },
   "files": [
     "dist",
-    "src"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm run clean && pnpm run build && pnpm run test"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "dependencies": {
     "@graphos/core": "workspace:*",
