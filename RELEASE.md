@@ -1,79 +1,66 @@
 # Releasing GraphOS
 
-You — Ahmed — run these commands. I (Claude) won't publish on your behalf.
+Maintainer guide for cutting a new release. Public users don't need this — see the root [README](./README.md) instead.
 
-## One-time setup
+## Prerequisites
 
-```bash
-# Log in to npm
-npm login
+- npm account in the `graphos-io` org (https://www.npmjs.com/org/graphos-io)
+- Either a granular access token with "bypass 2FA on publish" enabled, or a TOTP authenticator if your account uses code-based 2FA
 
-# Confirm you have access to the @graphos scope (create org on npm if not)
-npm org ls graphos
-```
+## Workflow
 
-If `@graphos` is not yet your scope, create it at https://www.npmjs.com/org/create.
+1. Decide which package(s) need a bump. Don't version unchanged packages.
+2. Bump versions in the affected `package.json` files.
+3. Update `CHANGELOG.md` with the changes under a new heading.
+4. Run the full check:
+   ```bash
+   pnpm -r build
+   pnpm -r test
+   ```
+5. Pack each affected package (pnpm rewrites `workspace:*` to the resolved version):
+   ```bash
+   rm -rf /tmp/graphos-publish && mkdir -p /tmp/graphos-publish
+   cd packages/core      && pnpm pack --pack-destination /tmp/graphos-publish
+   cd ../sdk             && pnpm pack --pack-destination /tmp/graphos-publish
+   cd ../dashboard       && rm -rf .next/cache && pnpm pack --pack-destination /tmp/graphos-publish
+   ```
+6. Publish in dependency order — `core` → `sdk` → `dashboard`:
+   ```bash
+   npm publish /tmp/graphos-publish/graphos-io-core-X.Y.Z.tgz       --access public
+   npm publish /tmp/graphos-publish/graphos-io-sdk-X.Y.Z.tgz        --access public
+   npm publish /tmp/graphos-publish/graphos-io-dashboard-X.Y.Z.tgz  --access public
+   ```
+7. Verify:
+   ```bash
+   npm view @graphos-io/core version
+   npm view @graphos-io/sdk version
+   npm view @graphos-io/dashboard version
+   ```
+8. Commit, tag, push:
+   ```bash
+   git commit -am "chore(release): vX.Y.Z"
+   git tag -a vX.Y.Z -m "vX.Y.Z"
+   git push origin main
+   git push origin vX.Y.Z
+   ```
+9. Optionally create a GitHub Release pointing at the tag, body = the CHANGELOG entry.
 
-## Publish v1.0.0
+## Why `pnpm pack` then `npm publish`
 
-Always publish in dependency order: `core` → `sdk` → `dashboard`.
+`pnpm pack` rewrites `workspace:*` dependencies to the actual published version inside the tarball. A direct `npm publish` from the source tree would publish `workspace:*` literally, which breaks installation outside the monorepo. `pnpm publish` would also rewrite, but doesn't accept `--auth-type=web` for browser-based 2FA, so we pack with pnpm and publish with npm.
 
-```bash
-cd /Applications/XAMPP/xamppfiles/htdocs/AI/graphos
+## Unpublishing
 
-# 1. Publish core (sdk depends on it)
-cd packages/core
-pnpm publish --access public --no-git-checks
-
-# 2. Publish sdk (dashboard depends on core; sdk depends on core)
-cd ../sdk
-pnpm publish --access public --no-git-checks
-
-# 3. Publish dashboard
-cd ../dashboard
-pnpm publish --access public --no-git-checks
-```
-
-Why `pnpm publish` (not `npm publish`):
-- pnpm rewrites `workspace:*` deps to the actual published version automatically.
-- `npm publish` would publish `workspace:*` literally, which is broken.
-
-`--no-git-checks` skips pnpm's "branch must be main / no uncommitted changes" check. Drop it if you'd rather pnpm enforce that.
-
-## Verify the published packages
-
-```bash
-# In a scratch dir
-mkdir /tmp/graphos-smoke && cd /tmp/graphos-smoke
-npm init -y
-npm install @graphos-io/sdk
-
-# Should print "1.0.0"
-node -e "console.log(require('@graphos-io/sdk/package.json').version)"
-
-# Run the dashboard from a fresh install
-npx @graphos-io/dashboard graphos dashboard
-# open http://localhost:4000
-```
-
-## Tag the release
+Within 72 hours of publish:
 
 ```bash
-cd /Applications/XAMPP/xamppfiles/htdocs/AI/graphos
-git tag -a v1.0.0 -m "v1.0.0"
-git push origin v1.0.0
+npm unpublish @graphos-io/<package>@X.Y.Z
 ```
 
-Optionally create a GitHub release pointing at the tag with the v1.0.0 section of CHANGELOG.md as the body.
-
-## Patch releases
-
-Bump the version in the affected package(s), update CHANGELOG.md, and re-run the publish steps for those packages only. Don't bump unaffected packages.
-
-## Unpublish (within 72h)
+After 72 hours, npm rejects unpublish. Use deprecate instead:
 
 ```bash
-npm unpublish @graphos-io/dashboard@1.0.0
+npm deprecate @graphos-io/<package>@X.Y.Z "use vX.Y.Z+1 instead"
 ```
 
-After 72 hours, npm refuses unpublish for the version (you can deprecate it instead with `npm deprecate @graphos-io/dashboard@1.0.0 "use 1.0.1 instead"`).
+A version, once published, can never be republished — even after unpublish. Always bump the patch version when fixing a release.
