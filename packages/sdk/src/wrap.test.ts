@@ -144,3 +144,52 @@ describe("GraphOS.wrap onTrace", () => {
     expect(events[0]?.sessionId).toBe("my-session");
   });
 });
+
+describe("GraphOS.wrap invoke()", () => {
+  it("returns the merged final state, not the last raw chunk", async () => {
+    const wrapped = GraphOS.wrap<{ a?: number; b?: number }, { a: number; b: number }>(
+      makeGraph([{ nodeA: { a: 1 } }, { nodeB: { b: 2 } }])
+    );
+    const result = await wrapped.invoke({});
+    expect(result).toEqual({ a: 1, b: 2 });
+  });
+
+  it("starts from the input as the initial state", async () => {
+    const wrapped = GraphOS.wrap<{ start: string }, { start: string; ran: boolean }>(
+      makeGraph([{ nodeA: { ran: true } }])
+    );
+    const result = await wrapped.invoke({ start: "hello" });
+    expect(result).toEqual({ start: "hello", ran: true });
+  });
+
+  it("concatenates messages across steps (add_messages reducer behavior)", async () => {
+    const wrapped = GraphOS.wrap(
+      makeGraph([
+        { nodeA: { messages: [{ role: "user", content: "hi" }] } },
+        { nodeB: { messages: [{ role: "assistant", content: "hello" }] } },
+      ])
+    );
+    const result = await wrapped.invoke({ messages: [] }) as {
+      messages: Array<{ role: string }>;
+    };
+    expect(result.messages.map((m) => m.role)).toEqual(["user", "assistant"]);
+  });
+
+  it("appends a single (non-array) message update to messages array", async () => {
+    const wrapped = GraphOS.wrap(
+      makeGraph([{ nodeA: { messages: { role: "assistant", content: "hi" } } }])
+    );
+    const result = await wrapped.invoke({ messages: [] }) as {
+      messages: Array<{ role: string }>;
+    };
+    expect(result.messages).toEqual([{ role: "assistant", content: "hi" }]);
+  });
+
+  it("later step overwrites scalar keys (last-write-wins)", async () => {
+    const wrapped = GraphOS.wrap(
+      makeGraph([{ nodeA: { status: "running" } }, { nodeB: { status: "done" } }])
+    );
+    const result = await wrapped.invoke({}) as { status: string };
+    expect(result.status).toBe("done");
+  });
+});

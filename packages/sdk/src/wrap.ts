@@ -33,6 +33,30 @@ export interface WrappedGraph<TInput, TOutput> {
   ): AsyncIterable<Record<string, unknown>>;
 }
 
+const isPlainObject = (v: unknown): v is Record<string, unknown> =>
+  v !== null && typeof v === "object" && !Array.isArray(v);
+
+const mergeState = (
+  acc: Record<string, unknown>,
+  update: Record<string, unknown>
+): Record<string, unknown> => {
+  const out: Record<string, unknown> = { ...acc };
+  for (const [k, v] of Object.entries(update)) {
+    const prev = out[k];
+    if (k === "messages") {
+      const prevArr = Array.isArray(prev) ? prev : [];
+      if (Array.isArray(v)) out[k] = [...prevArr, ...v];
+      else if (v !== undefined && v !== null) out[k] = [...prevArr, v];
+      else out[k] = prevArr;
+    } else if (isPlainObject(prev) && isPlainObject(v)) {
+      out[k] = mergeState(prev, v);
+    } else {
+      out[k] = v;
+    }
+  }
+  return out;
+};
+
 let sessionCounter = 0;
 const newSessionId = (): SessionId =>
   `gos_${Date.now().toString(36)}_${(sessionCounter++).toString(36)}` as SessionId;
@@ -188,11 +212,17 @@ export const GraphOS = {
     return {
       stream: runStream,
       async invoke(input: TInput, config?: unknown): Promise<TOutput> {
-        let last: Record<string, unknown> | undefined;
+        let merged: Record<string, unknown> = isPlainObject(input)
+          ? { ...(input as Record<string, unknown>) }
+          : {};
         for await (const chunk of runStream(input, config)) {
-          last = chunk;
+          for (const stateUpdate of Object.values(chunk)) {
+            if (isPlainObject(stateUpdate)) {
+              merged = mergeState(merged, stateUpdate);
+            }
+          }
         }
-        return last as TOutput;
+        return merged as TOutput;
       },
     };
   },
