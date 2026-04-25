@@ -5,6 +5,17 @@ import { DatabaseSync } from "node:sqlite";
 
 const MAX_REPLAY_EVENTS = 5_000;
 
+const DEFAULT_RETENTION_SESSIONS = 200;
+const PRUNE_EVERY_N_INSERTS = 500;
+
+const parseRetention = () => {
+  const raw = process.env.GRAPHOS_RETENTION_SESSIONS;
+  if (!raw) return DEFAULT_RETENTION_SESSIONS;
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n <= 0) return DEFAULT_RETENTION_SESSIONS;
+  return Math.floor(n);
+};
+
 export const defaultDbPath = () =>
   process.env.GRAPHOS_DB_PATH ?? join(homedir(), ".graphos", "traces.db");
 
@@ -60,12 +71,44 @@ export const createTraceStore = (dbPath = defaultDbPath()) => {
     ORDER BY id ASC
   `);
 
+  const oldestSessionsStmt = db.prepare(`
+    SELECT session_id, MIN(id) AS first_id
+    FROM events
+    GROUP BY session_id
+    ORDER BY first_id ASC
+    LIMIT ?
+  `);
+  const deleteSessionStmt = db.prepare(
+    "DELETE FROM events WHERE session_id = ?"
+  );
+
+  const retention = parseRetention();
+  let insertsSincePrune = 0;
+
+  const prune = () => {
+    const total = Number(distinctSessionsStmt.get().n);
+    if (total <= retention) return 0;
+    const drop = total - retention;
+    const victims = oldestSessionsStmt.all(drop);
+    let removed = 0;
+    for (const row of victims) {
+      const result = deleteSessionStmt.run(row.session_id);
+      removed += Number(result.changes ?? 0);
+    }
+    return removed;
+  };
+
   const insert = (event) => {
     if (!event || typeof event !== "object") return;
     const { sessionId, kind } = event;
     if (typeof sessionId !== "string" || typeof kind !== "string") return;
     const ts = typeof event.timestamp === "number" ? event.timestamp : Date.now();
     insertStmt.run(sessionId, kind, ts, JSON.stringify(event));
+    insertsSincePrune += 1;
+    if (insertsSincePrune >= PRUNE_EVERY_N_INSERTS) {
+      insertsSincePrune = 0;
+      prune();
+    }
   };
 
   const recent = (limit = MAX_REPLAY_EVENTS) => {
@@ -116,6 +159,8 @@ export const createTraceStore = (dbPath = defaultDbPath()) => {
     stats,
     listSessions,
     sessionEvents,
+    prune,
+    retention,
     close,
     path: dbPath,
   };
