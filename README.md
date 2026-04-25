@@ -2,8 +2,10 @@
 
 **The Service Mesh for AI Agents.**
 
+[![npm version](https://img.shields.io/npm/v/@graphos-io/sdk?color=7cffb0&label=%40graphos-io%2Fsdk)](https://www.npmjs.com/package/@graphos-io/sdk)
+[![npm downloads](https://img.shields.io/npm/dm/@graphos-io/sdk?color=7cffb0)](https://www.npmjs.com/package/@graphos-io/sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-![Status: v1](https://img.shields.io/badge/status-v1-green)
+[![Node ≥ 20](https://img.shields.io/badge/node-%3E%3D20-7cffb0)](https://nodejs.org/)
 
 **GraphOS** is an open-source governance and observability layer for [LangGraph.js](https://langchain-ai.github.io/langgraphjs/).
 
