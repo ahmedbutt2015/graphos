@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  
+  
+  
+
+  
+  
+  <line x1="152" y1="242" x2="232" y2="194" stroke="#e6eaf0" stroke-width="14" stroke-linecap="round"></line>
+  
+  <line x1="280" y1="194" x2="360" y2="242" stroke="#e6eaf0" stroke-width="14" stroke-linecap="round"></line>
+  
+  <line x1="370" y1="274" x2="280" y2="320" stroke="#e6eaf0" stroke-width="14" stroke-linecap="round"></line>
+  
+  <line x1="232" y1="320" x2="152" y2="274" stroke="#e6eaf0" stroke-width="14" stroke-linecap="round"></line>
+
+  
+  
+  <rect x="182" y="208" width="20" height="20" rx="2" transform="rotate(45 192 218)" fill="#0b0d10" stroke="#e6eaf0" stroke-width="10" stroke-linejoin="round"></rect>
+
+  
+  <polygon points="360,242 344,232 348,250" fill="#e6eaf0"></polygon>
+  
+  <polygon points="280,320 288,302 296,316" fill="#e6eaf0"></polygon>
+  
+  <polygon points="152,274 168,266 164,282" fill="#e6eaf0"></polygon>
+  
+  <polygon points="232,194 218,188 220,204" fill="#e6eaf0"></polygon>
+
+  
+  
+  <circle cx="128" cy="256" r="28" fill="#0b0d10" stroke="#e6eaf0" stroke-width="14"></circle>
+  
+  <circle cx="256" cy="180" r="28" fill="#0b0d10" stroke="#e6eaf0" stroke-width="14"></circle>
+  
+  <circle cx="384" cy="256" r="28" fill="#0b0d10" stroke="#e6eaf0" stroke-width="14"></circle>
+  
+  <circle cx="256" cy="332" r="28" fill="#0b0d10" stroke="#e6eaf0" stroke-width="14"></circle>
+</svg>

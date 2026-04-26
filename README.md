@@ -1,15 +1,25 @@
-# 🚀 GraphOS
+<p align="center">
+  <img src="./assets/logo-wordmark.svg" alt="GraphOS" width="480" />
+</p>
 
-**The Service Mesh for AI Agents.**
+<p align="center"><strong>The Service Mesh for AI Agents.</strong></p>
 
-[![npm version](https://img.shields.io/npm/v/@graphos-io/sdk?color=7cffb0&label=%40graphos-io%2Fsdk)](https://www.npmjs.com/package/@graphos-io/sdk)
-[![npm downloads](https://img.shields.io/npm/dm/@graphos-io/sdk?color=7cffb0)](https://www.npmjs.com/package/@graphos-io/sdk)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Node ≥ 20](https://img.shields.io/badge/node-%3E%3D20-7cffb0)](https://nodejs.org/)
+<p align="center">
+  <a href="https://www.npmjs.com/package/@graphos-io/sdk"><img src="https://img.shields.io/npm/v/@graphos-io/sdk?color=7cffb0&label=%40graphos-io%2Fsdk" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/@graphos-io/sdk"><img src="https://img.shields.io/npm/dm/@graphos-io/sdk?color=7cffb0" alt="npm downloads" /></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
+  <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/node-%3E%3D20-7cffb0" alt="Node >= 20" /></a>
+</p>
 
 **GraphOS** is an open-source governance and observability layer for [LangGraph.js](https://langchain-ai.github.io/langgraphjs/).
 
 Wrap your compiled graph in one line, get policy enforcement (loops, budgets) and a local-first live dashboard with time-travel replay. No SaaS, no signup, no telemetry leaving your machine.
+
+<p align="center">
+  <video src="https://raw.githubusercontent.com/ahmedbutt2015/graphos/main/assets/hero.mp4" autoplay loop muted playsinline width="900" poster="https://raw.githubusercontent.com/ahmedbutt2015/graphos/main/assets/architecture.svg">
+    <a href="./assets/hero.mp4">▶ Watch the demo — GraphOS catches a runaway agent loop (12s)</a>
+  </video>
+</p>
 
 ---
 
@@ -113,18 +123,9 @@ The dashboard persists every event to `~/.graphos/traces.db`. By default it keep
 
 ## 🏗 Architecture
 
-```
-your code                                ┌───────────────────────────┐
-   │                                     │   @graphos-io/dashboard      │
-   ▼                                     │                           │
-┌───────────────┐    onTrace             │  • Next.js + React Flow   │
-│ @graphos-io/sdk  │ ────WebSocket────────► │  • SQLite (~/.graphos/)   │
-│ GraphOS.wrap()│                        │  • Time-travel scrubber   │
-└───────┬───────┘                        │  • Per-step detail panel  │
-        │ stream()                       └───────────────────────────┘
-        ▼
-   compiled LangGraph
-```
+<p align="center">
+  <img src="./assets/architecture.svg" alt="GraphOS architecture: your code → @graphos-io/sdk → @graphos-io/dashboard, with SQLite persistence" width="900" />
+</p>
 
 The SDK runs in your process — zero network calls unless you point a transport at one. The dashboard is a separate local process started with `graphos dashboard`.
 

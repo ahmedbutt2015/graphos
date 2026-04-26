@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 120" width="640" height="120">
+  <rect width="640" height="120" fill="#0b0d10"/>
+  <g transform="translate(14, 18) scale(0.15625)">
+    <line x1="121" y1="304" x2="196" y2="213" stroke="#7cffb0" stroke-width="12" stroke-linecap="round"/>
+    <rect x="185" y="201" width="22" height="22" rx="2" transform="rotate(45 196 212)" fill="#0b0d10" stroke="#7cffb0" stroke-width="10" stroke-linejoin="miter"/>
+    <line x1="207" y1="211" x2="238" y2="165" stroke="#7cffb0" stroke-width="12" stroke-linecap="round"/>
+    <line x1="274" y1="165" x2="392" y2="301" stroke="#e6eaf0" stroke-width="12" stroke-linecap="round"/>
+    <line x1="390" y1="325" x2="122" y2="325" stroke="#e6eaf0" stroke-width="12" stroke-linecap="round"/>
+    <polygon points="392,301 372,290 380,308" fill="#e6eaf0"/>
+    <polygon points="122,325 140,314 140,336" fill="#e6eaf0"/>
+    <polygon points="238,165 222,160 228,176" fill="#7cffb0"/>
+    <circle cx="106" cy="325" r="26" fill="#0b0d10" stroke="#e6eaf0" stroke-width="12"/>
+    <circle cx="256" cy="140" r="26" fill="#0b0d10" stroke="#7cffb0" stroke-width="12"/>
+    <circle cx="406" cy="325" r="26" fill="#0b0d10" stroke="#e6eaf0" stroke-width="12"/>
+  </g>
+  <text x="116" y="78" font-family="'Geist', 'Inter', system-ui, sans-serif" font-size="60" font-weight="600" letter-spacing="-1.5" fill="#e6eaf0">GraphOS</text>
+</svg>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GraphOS — Logo System</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Geist', 'Inter', system-ui, sans-serif;
+    background: #0b0d10;
+    color: #e6eaf0;
+    min-height: 100vh;
+    padding: 64px 48px;
+  }
+  .header { margin-bottom: 64px; }
+  .header h1 { font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6b7380; margin-bottom: 8px; }
+  .header p { font-size: 22px; font-weight: 600; color: #e6eaf0; }
+  .section { margin-bottom: 72px; }
+  .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #6b7380; margin-bottom: 24px; border-bottom: 1px solid #1e2229; padding-bottom: 12px; }
+  .row { display: flex; gap: 32px; flex-wrap: wrap; align-items: center; }
+  .cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .cell-label { font-size: 11px; color: #6b7380; letter-spacing: 0.06em; }
+  .bg-dark { background: #0b0d10; padding: 40px; border-radius: 8px; border: 1px solid #1e2229; }
+  .bg-light { background: #ffffff; padding: 40px; border-radius: 8px; }
+  .bg-panel { background: #111418; padding: 40px; border-radius: 8px; border: 1px solid #1e2229; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>GraphOS — Logo System</h1>
+  <p>Service mesh for AI agents</p>
+</div>
+
+<!-- MARK SVGs inline for easy export -->
+
+<div class="section">
+  <div class="section-label">Square Mark — 512×512</div>
+  <div class="row">
+
+    <div class="cell">
+      <div class="bg-dark">
+        <!-- DARK BG MARK -->
+        <svg id="mark-dark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="160" height="160">
+          <!-- Three nodes: A(106,320), B(256,140), C(406,320) -->
+          <!-- Edges: A->B, B->C, C->A (directed cycle) with gate on A->B -->
+
+          <!-- Edge A->B: intercepted by gate -->
+          <!-- First segment: A to gate -->
+          <line x1="121" y1="304" x2="196" y2="213" stroke="#e6eaf0" stroke-width="12" stroke-linecap="round"/>
+          <!-- Gate diamond at midpoint (~195,212) -->
+          <rect x="185" y="201" width="22" height="22" rx="2"
+                transform="rotate(45 196 212)"
+                fill="#0b0d10" stroke="#e6eaf0" stroke-width="10" stroke-linejoin="miter"/>
+          <!-- Second segment: gate to B -->
+          <line x1="207" y1="211" x2="238" y2="165" stroke="#e6eaf0" stroke-width="12" stroke-linecap="round"/>
+
+          <!-- Edge B->C -->
+          <line x1="274" y1="165" x2="392" y2="301" stroke="#e6eaf0" stroke-width="12" stroke-linecap="round"/>
+
+          <!-- Edge C->A -->
+          <line x1="390" y1="325" x2="122" y2="325" stroke="#e6eaf0" stroke-width="12" stroke-linecap="round"/>
+
+          <!-- Arrowhead B->C end -->
+          <polygon points="392,301 372,290 380,308" fill="#e6eaf0"/>
+          <!-- Arrowhead C->A end -->
+          <polygon points="122,325 140,314 140,336" fill="#e6eaf0"/>
+          <!-- Arrowhead after gate (A->B) -->
+          <polygon points="238,165 222,160 228,176" fill="#e6eaf0"/>
+
+          <!-- Node A -->
+          <circle cx="106" cy="325" r="26" fill="#0b0d10" stroke="#e6eaf0" stroke-width="12"/>
+          <!-- Node B -->
+          <circle cx="256" cy="140" r="26" fill="#0b0d10" stroke="#e6eaf0" stroke-width="12"/>
+          <!-- Node C -->
+          <circle cx="406" cy="325" r="26" fill="#0b0d10" stroke="#e6eaf0" stroke-width="12"/>
+        </svg>
+      </div>
+      <span class="cell-label">Dark bg — monochrome</span>
+    </div>
+
+    <div class="cell">
+      <div class="bg-dark">
+        <!-- DARK BG MARK with accent -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="160" height="160">
+          <!-- Edge A->B: gate — accent colored -->
+          <line x1="121" y1="304" x2="196" y2="213" stroke="#7cffb0" stroke-width="12" stroke-linecap="round"/>
+          <rect x="185" y="201" width="22" height="22" rx="2"
+                transform="rotate(45 196 212)"
+                fill="#0b0d10" stroke="#7cffb0" stroke-width="10" stroke-linejoin="miter"/>
+          <line x1="207" y1="211" x2="238" y2="165" stroke="#7cffb0" stroke-width="12" stroke-linecap="round"/>
+          <!-- B->C normal -->
+          <line x1="274" y1="165" x2="392" y2="301" stroke="#e6eaf0" stroke-width="12" stroke-linecap="round"/>
+          <!-- C->A normal -->
+          <line x1="390" y1="325" x2="122" y2="325" stroke="#e6eaf0" stroke-width="12" stroke-linecap="round"/>
+
+          <polygon points="392,301 372,290 380,308" fill="#e6eaf0"/>
+          <polygon points="122,325 140,314 140,336" fill="#e6eaf0"/>
+          <polygon points="238,165 222,160 228,176" fill="#7cffb0"/>
+
+          <circle cx="106" cy="325" r="26" fill="#0b0d10" stroke="#e6eaf0" stroke-width="12"/>
+          <circle cx="256" cy="140" r="26" fill="#0b0d10" stroke="#7cffb0" stroke-width="12"/>
+          <circle cx="406" cy="325" r="26" fill="#0b0d10" stroke="#e6eaf0" stroke-width="12"/>
+        </svg>
+      </div>
+      <span class="cell-label">Dark bg — accent variant</span>
+    </div>
+
+    <div class="cell">
+      <div class="bg-light">
+        <!-- LIGHT BG MARK -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="160" height="160">
+          <line x1="121" y1="304" x2="196" y2="213" stroke="#0b0d10" stroke-width="12" stroke-linecap="round"/>
+          <rect x="185" y="201" width="22" height="22" rx="2"
+                transform="rotate(45 196 212)"
+                fill="#ffffff" stroke="#0b0d10" stroke-width="10" stroke-linejoin="miter"/>
+          <line x1="207" y1="211" x2="238" y2="165" stroke="#0b0d10" stroke-width="12" stroke-linecap="round"/>
+          <line x1="274" y1="165" x2="392" y2="301" stroke="#0b0d10" stroke-width="12" stroke-linecap="round"/>
+          <line x1="390" y1="325" x2="122" y2="325" stroke="#0b0d10" stroke-width="12" stroke-linecap="round"/>
+          <polygon points="392,301 372,290 380,308" fill="#0b0d10"/>
+          <polygon points="122,325 140,314 140,336" fill="#0b0d10"/>
+          <polygon points="238,165 222,160 228,176" fill="#0b0d10"/>
+          <circle cx="106" cy="325" r="26" fill="#ffffff" stroke="#0b0d10" stroke-width="12"/>
+          <circle cx="256" cy="140" r="26" fill="#ffffff" stroke="#0b0d10" stroke-width="12"/>
+          <circle cx="406" cy="325" r="26" fill="#ffffff" stroke="#0b0d10" stroke-width="12"/>
+        </svg>
+      </div>
+      <span class="cell-label">Light bg — monochrome</span>
+    </div>
+
+    <div class="cell">
+      <div class="bg-light">
+        <!-- LIGHT BG MARK accent -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="160" height="160">
+          <line x1="121" y1="304" x2="196" y2="213" stroke="#16a860" stroke-width="12" stroke-linecap="round"/>
+          <rect x="185" y="201" width="22" height="22" rx="2"
+                transform="rotate(45 196 212)"
+                fill="#ffffff" stroke="#16a860" stroke-width="10" stroke-linejoin="miter"/>
+          <line x1="207" y1="211" x2="238" y2="165" stroke="#16a860" stroke-width="12" stroke-linecap="round"/>
+          <line x1="274" y1="165" x2="392" y2="301" stroke="#0b0d10" stroke-width="12" stroke-linecap="round"/>
+          <line x1="390" y1="325" x2="122" y2="325" stroke="#0b0d10" stroke-width="12" stroke-linecap="round"/>
+          <polygon points="392,301 372,290 380,308" fill="#0b0d10"/>
+          <polygon points="122,325 140,314 140,336" fill="#0b0d10"/>
+          <polygon points="238,165 222,160 228,176" fill="#16a860"/>
+          <circle cx="106" cy="325" r="26" fill="#ffffff" stroke="#0b0d10" stroke-width="12"/>
+          <circle cx="256" cy="140" r="26" fill="#ffffff" stroke="#16a860" stroke-width="12"/>
+          <circle cx="406" cy="325" r="26" fill="#ffffff" stroke="#0b0d10" stroke-width="12"/>
+        </svg>
+      </div>
+      <span class="cell-label">Light bg — accent variant</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- WORDMARK -->
+<div class="section">
+  <div class="section-label">Wordmark</div>
+  <div class="row">
+
+    <div class="cell">
+      <div class="bg-dark" style="padding: 32px 48px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 100" width="420" height="75">
+          <!-- Mark scaled to 80px tall, centered at y=50 -->
+          <!-- Original viewBox 512x512, scale factor = 80/512 = 0.15625, translate x=10, y=10 -->
+          <g transform="translate(4, 8) scale(0.15625)">
+            <line x1="121" y1="304" x2="196" y2="213" stroke="#e6eaf0" stroke-width="12" stroke-linecap="round"/>
+            <rect x="185" y="201" width="22" height="22" rx="2" transform="rotate(45 196 212)" fill="#0b0d10" stroke="#e6eaf0" stroke-width="10" stroke-linejoin="miter"/>
+            <line x1="207" y1="211" x2="238" y2="165" stroke="#e6eaf0" stroke-width="12" stroke-linecap="round"/>
+            <line x1="274" y1="165" x2="392" y2="301" stroke="#e6eaf0" stroke-width="12" stroke-linecap="round"/>
+            <line x1="390" y1="325" x2="122" y2="325" stroke="#e6eaf0" stroke-width="12" stroke-linecap="round"/>
+            <polygon points="392,301 372,290 380,308" fill="#e6eaf0"/>
+            <polygon points="122,325 140,314 140,336" fill="#e6eaf0"/>
+            <polygon points="238,165 222,160 228,176" fill="#e6eaf0"/>
+            <circle cx="106" cy="325" r="26" fill="#0b0d10" stroke="#e6eaf0" stroke-width="12"/>
+            <circle cx="256" cy="140" r="26" fill="#0b0d10" stroke="#e6eaf0" stroke-width="12"/>
+            <circle cx="406" cy="325" r="26" fill="#0b0d10" stroke="#e6eaf0" stroke-width="12"/>
+          </g>
+          <!-- Wordmark text -->
+          <text x="96" y="64" font-family="'Geist', 'Inter', system-ui, sans-serif" font-size="52" font-weight="600" letter-spacing="-1.5" fill="#e6eaf0">GraphOS</text>
+        </svg>
+      </div>
+      <span class="cell-label">Wordmark — dark</span>
+    </div>
+
+    <div class="cell">
+      <div class="bg-dark" style="padding: 32px 48px;">
+        <!-- Accent wordmark -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 100" width="420" height="75">
+          <g transform="translate(4, 8) scale(0.15625)">
+            <line x1="121" y1="304" x2="196" y2="213" stroke="#7cffb0" stroke-width="12" stroke-linecap="round"/>
+            <rect x="185" y="201" width="22" height="22" rx="2" transform="rotate(45 196 212)" fill="#0b0d10" stroke="#7cffb0" stroke-width="10" stroke-linejoin="miter"/>
+            <line x1="207" y1="211" x2="238" y2="165" stroke="#7cffb0" stroke-width="12" stroke-linecap="round"/>
+            <line x1="274" y1="165" x2="392" y2="301" stroke="#e6eaf0" stroke-width="12" stroke-linecap="round"/>
+            <line x1="390" y1="325" x2="122" y2="325" stroke="#e6eaf0" stroke-width="12" stroke-linecap="round"/>
+            <polygon points="392,301 372,290 380,308" fill="#e6eaf0"/>
+            <polygon points="122,325 140,314 140,336" fill="#e6eaf0"/>
+            <polygon points="238,165 222,160 228,176" fill="#7cffb0"/>
+            <circle cx="106" cy="325" r="26" fill="#0b0d10" stroke="#e6eaf0" stroke-width="12"/>
+            <circle cx="256" cy="140" r="26" fill="#0b0d10" stroke="#7cffb0" stroke-width="12"/>
+            <circle cx="406" cy="325" r="26" fill="#0b0d10" stroke="#e6eaf0" stroke-width="12"/>
+          </g>
+          <text x="96" y="64" font-family="'Geist', 'Inter', system-ui, sans-serif" font-size="52" font-weight="600" letter-spacing="-1.5" fill="#e6eaf0">GraphOS</text>
+        </svg>
+      </div>
+      <span class="cell-label">Wordmark — accent</span>
+    </div>
+
+    <div class="cell">
+      <div class="bg-light" style="padding: 32px 48px;">
+        <!-- Light wordmark -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 100" width="420" height="75">
+          <g transform="translate(4, 8) scale(0.15625)">
+            <line x1="121" y1="304" x2="196" y2="213" stroke="#0b0d10" stroke-width="12" stroke-linecap="round"/>
+            <rect x="185" y="201" width="22" height="22" rx="2" transform="rotate(45 196 212)" fill="#ffffff" stroke="#0b0d10" stroke-width="10" stroke-linejoin="miter"/>
+            <line x1="207" y1="211" x2="238" y2="165" stroke="#0b0d10" stroke-width="12" stroke-linecap="round"/>
+            <line x1="274" y1="165" x2="392" y2="301" stroke="#0b0d10" stroke-width="12" stroke-linecap="round"/>
+            <line x1="390" y1="325" x2="122" y2="325" stroke="#0b0d10" stroke-width="12" stroke-linecap="round"/>
+            <polygon points="392,301 372,290 380,308" fill="#0b0d10"/>
+            <polygon points="122,325 140,314 140,336" fill="#0b0d10"/>
+            <polygon points="238,165 222,160 228,176" fill="#0b0d10"/>
+            <circle cx="106" cy="325" r="26" fill="#ffffff" stroke="#0b0d10" stroke-width="12"/>
+            <circle cx="256" cy="140" r="26" fill="#ffffff" stroke="#0b0d10" stroke-width="12"/>
+            <circle cx="406" cy="325" r="26" fill="#ffffff" stroke="#0b0d10" stroke-width="12"/>
+          </g>
+          <text x="96" y="64" font-family="'Geist', 'Inter', system-ui, sans-serif" font-size="52" font-weight="600" letter-spacing="-1.5" fill="#0b0d10">GraphOS</text>
+        </svg>
+      </div>
+      <span class="cell-label">Wordmark — light</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- FAVICON -->
+<div class="section">
+  <div class="section-label">Favicon — 32×32</div>
+  <div class="row">
+    <div class="cell">
+      <div class="bg-dark" style="padding: 24px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="64" height="64">
+          <!-- Simplified: 3 nodes, 2 edges + gate indicator -->
+          <!-- Node positions: L(5,22), T(16,6), R(27,22) -->
+          <line x1="6" y1="21" x2="14" y2="9" stroke="#e6eaf0" stroke-width="2" stroke-linecap="round"/>
+          <!-- Gate dot on L->T edge -->
+          <rect x="8.5" y="13.5" width="4" height="4" rx="0.5" transform="rotate(45 10.5 15.5)" fill="#0b0d10" stroke="#e6eaf0" stroke-width="1.5" stroke-linejoin="miter"/>
+          <line x1="18" y1="9" x2="26" y2="21" stroke="#e6eaf0" stroke-width="2" stroke-linecap="round"/>
+          <line x1="25" y1="23" x2="7" y2="23" stroke="#e6eaf0" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="5" cy="23" r="3.5" fill="#0b0d10" stroke="#e6eaf0" stroke-width="2"/>
+          <circle cx="16" cy="6" r="3.5" fill="#0b0d10" stroke="#e6eaf0" stroke-width="2"/>
+          <circle cx="27" cy="23" r="3.5" fill="#0b0d10" stroke="#e6eaf0" stroke-width="2"/>
+        </svg>
+      </div>
+      <span class="cell-label">32×32 dark (shown 2×)</span>
+    </div>
+    <div class="cell">
+      <div class="bg-light" style="padding: 24px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="64" height="64">
+          <line x1="6" y1="21" x2="14" y2="9" stroke="#0b0d10" stroke-width="2" stroke-linecap="round"/>
+          <rect x="8.5" y="13.5" width="4" height="4" rx="0.5" transform="rotate(45 10.5 15.5)" fill="#ffffff" stroke="#0b0d10" stroke-width="1.5" stroke-linejoin="miter"/>
+          <line x1="18" y1="9" x2="26" y2="21" stroke="#0b0d10" stroke-width="2" stroke-linecap="round"/>
+          <line x1="25" y1="23" x2="7" y2="23" stroke="#0b0d10" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="5" cy="23" r="3.5" fill="#ffffff" stroke="#0b0d10" stroke-width="2"/>
+          <circle cx="16" cy="6" r="3.5" fill="#ffffff" stroke="#0b0d10" stroke-width="2"/>
+          <circle cx="27" cy="23" r="3.5" fill="#ffffff" stroke="#0b0d10" stroke-width="2"/>
+        </svg>
+      </div>
+      <span class="cell-label">32×32 light (shown 2×)</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
