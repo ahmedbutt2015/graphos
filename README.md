@@ -50,15 +50,25 @@ GraphOS fixes this by wrapping your `CompiledGraph` with a policy-driven interce
 
 ## 🛠 Install
 
+**TypeScript / Node:**
+
 ```bash
 npm install @graphos-io/sdk
 # or
 pnpm add @graphos-io/sdk
 ```
 
+**Python:**
+
+```bash
+pip install graphos-io
+```
+
 ---
 
 ## 🚀 Quick start
+
+**TypeScript:**
 
 ```typescript
 import {
@@ -94,7 +104,38 @@ try {
 }
 ```
 
+**Python:**
+
+```python
+import asyncio
+from graphos_io import (
+    wrap, LoopGuard, BudgetGuard, token_cost,
+    create_websocket_transport, PolicyViolationError,
+)
+from my_agent import build_graph  # your compiled LangGraph
+
+async def main():
+    managed = wrap(
+        build_graph(),
+        project_id="my-agent",
+        policies=[
+            LoopGuard(mode="node", max_repeats=10),
+            BudgetGuard(usd_limit=2.0, cost=token_cost()),
+        ],
+        on_trace=create_websocket_transport(),
+    )
+    try:
+        result = await managed.invoke({"messages": [{"role": "user", "content": "Analyze the market."}]})
+        print(result)
+    except PolicyViolationError as err:
+        print(f"halted by {err.policy}: {err.reason}")
+
+asyncio.run(main())
+```
+
 `invoke()` returns the merged final state. `stream()` is also available if you want to consume per-step updates yourself.
+
+Both SDKs ship into the same dashboard over the same JSON-over-WebSocket protocol — point a Python agent and a TypeScript agent at it and watch both in one UI.
 
 ---
 
@@ -112,12 +153,13 @@ The dashboard persists every event to `~/.graphos/traces.db`. By default it keep
 
 ## 📦 Packages
 
-| Package | What it does |
-|---|---|
-| [`@graphos-io/core`](./packages/core) | Shared types (`Policy`, `NodeExecution`, `TraceEvent`) |
-| [`@graphos-io/sdk`](./packages/sdk) | `GraphOS.wrap()`, `LoopGuard`, `BudgetGuard`, `tokenCost`, transports |
-| [`@graphos-io/dashboard`](./packages/dashboard) | Next.js + React Flow dashboard with `graphos` CLI |
-| [`@graphos-io/mcp-proxy`](./packages/mcp-proxy) | Proxy MCP tool calls, emit GraphOS traces, redact payloads, and enforce MCP allow/deny rules |
+| Package | Language | What it does |
+|---|---|---|
+| [`@graphos-io/core`](./packages/core) | TS | Shared types (`Policy`, `NodeExecution`, `TraceEvent`) |
+| [`@graphos-io/sdk`](./packages/sdk) | TS | `GraphOS.wrap()`, `LoopGuard`, `BudgetGuard`, `tokenCost`, transports |
+| [`@graphos-io/dashboard`](./packages/dashboard) | TS | Next.js + React Flow dashboard with `graphos` CLI |
+| [`@graphos-io/mcp-proxy`](./packages/mcp-proxy) | TS | Proxy MCP tool calls, emit GraphOS traces, redact payloads, and enforce MCP allow/deny rules |
+| [`graphos-io`](./python) | Python | `wrap()`, `LoopGuard`, `BudgetGuard`, `MCPGuard`, `token_cost`, async-first transport |
 
 ---
 
@@ -155,7 +197,7 @@ Open [http://localhost:4000](http://localhost:4000).
 - [x] Per-step detail panel (messages, tool calls, usage)
 - [x] `graphos dashboard` CLI
 - [x] MCPGuard + MCP proxy
-- [ ] Python SDK parity
+- [x] Python SDK parity ([`graphos-io`](./python))
 
 ---
 

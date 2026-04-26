@@ -2,7 +2,7 @@
 title: "We Wrapped an Open-Source Agent in GraphOS and Turned the Debugging Session Into a Story"
 description: "A story-driven, hands-on report about taking an existing open-source LangGraph.js agent, wrapping it in GraphOS, and learning what observability actually feels like when an agent goes sideways."
 tags: [ai, agents, langgraph, typescript, opensource]
-canonical_url: https://github.com/ahmedbutt2015/graphos
+canonical_url: https://dev.to/ahmedbutt2015/we-wrapped-an-open-source-agent-in-graphos-and-turned-the-debugging-session-into-a-story-4de4
 cover_image: https://raw.githubusercontent.com/ahmedbutt2015/graphos/main/assets/logo-wordmark.svg
 published: false
 ---

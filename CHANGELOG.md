@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.2.0 — 2026-04-27
+
+### Added
+- **`graphos-io@1.0.0`** on PyPI — Python SDK at full feature parity with the TypeScript one. Async-first (`await managed.invoke(...)`, `async for chunk in managed.stream(...)`).
+  - `wrap()` for any compiled LangGraph (Python). Defaults to `subgraphs=True` and `stream_mode="updates"` to match the TS wrap.
+  - `LoopGuard` (state + node modes), `BudgetGuard`, `MCPGuard`, `extract_mcp_tool_calls`, `token_cost`.
+  - `create_websocket_transport` — ships into the same dashboard the TS SDK does. Bounded queue (drops oldest on overflow), exponential-backoff reconnect (1s → 30s), fire-and-forget API, never crashes the wrapped graph.
+  - Pydantic v2 models for all trace events. Field names mirror the TS SDK exactly so the dashboard receives the same shape from both languages.
+  - Strictly typed (`mypy --strict` clean), security-linted with `ruff` (bandit rules enabled), 60 unit tests including real-WebSocket reconnect-and-flush coverage.
+- Root README: Python install + quick-start tab next to TS, packages table now shows language column, roadmap flips Python SDK parity to ✅.
+
+### Notes
+- Same monorepo, same versioning cadence, same CHANGELOG. The Python wheel is built from `python/` with hatchling and ships standalone — Python users do not need Node installed unless they want the dashboard.
+
 ## 1.1.0 — 2026-04-26
 
 ### Added

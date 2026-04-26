@@ -1,0 +1,109 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "graphos-io"
+version = "1.0.0"
+description = "GraphOS — local-first observability and policy guards for LangGraph (Python). Wrap your compiled graph in one line."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Ahmed Butt" }]
+requires-python = ">=3.10"
+keywords = [
+  "langgraph",
+  "agents",
+  "observability",
+  "policies",
+  "loop-guard",
+  "budget-guard",
+  "mcp",
+  "graphos",
+  "ai",
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Typing :: Typed",
+]
+dependencies = [
+  "pydantic>=2.0",
+  "websockets>=12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-asyncio>=0.23",
+  "mypy>=1.8",
+  "ruff>=0.4",
+  "build>=1.0",
+  "twine>=5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/ahmedbutt2015/graphos#readme"
+Repository = "https://github.com/ahmedbutt2015/graphos"
+Issues = "https://github.com/ahmedbutt2015/graphos/issues"
+Changelog = "https://github.com/ahmedbutt2015/graphos/blob/main/CHANGELOG.md"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/graphos_io"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/graphos_io",
+  "tests",
+  "README.md",
+  "LICENSE",
+  "pyproject.toml",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+filterwarnings = ["error"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+files = ["src/graphos_io", "tests"]
+explicit_package_bases = true
+mypy_path = ["src"]
+
+[[tool.mypy.overrides]]
+module = ["websockets.*"]
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+  "E", "F", "W",     # pycodestyle + pyflakes
+  "I",               # isort
+  "B",               # flake8-bugbear
+  "UP",              # pyupgrade
+  "RUF",             # ruff-specific
+  "SIM",             # flake8-simplify
+  "S",               # flake8-bandit (security)
+]
+ignore = [
+  "E501",            # line length handled by formatter
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+  "S101",  # allow assert in tests
+  "S108",  # allow hardcoded /tmp/* paths in test fixtures (not real file ops)
+]
