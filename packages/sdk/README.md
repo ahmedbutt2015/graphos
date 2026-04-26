@@ -13,6 +13,7 @@ import {
   GraphOS,
   LoopGuard,
   BudgetGuard,
+  MCPGuard,
   tokenCost,
   createWebSocketTransport,
   PolicyViolationError,
@@ -23,6 +24,7 @@ const managed = GraphOS.wrap(myCompiledGraph, {
   projectId: "my-agent",
   policies: [
     new LoopGuard({ mode: "node", maxRepeats: 10 }),
+    new MCPGuard({ denyServers: ["filesystem"], maxCallsPerTool: 5 }),
     new BudgetGuard({ usdLimit: 2.0, cost: tokenCost() }),
   ],
   onTrace: createWebSocketTransport(),
@@ -58,6 +60,21 @@ new BudgetGuard({ usdLimit: number, cost: (execution) => number })
 ```
 
 Sums `cost(execution)` across every step and halts when cumulative spend exceeds `usdLimit`. Pair with `tokenCost()` for the common case.
+
+### `MCPGuard`
+
+```typescript
+new MCPGuard({
+  allowServers?: string[],
+  denyServers?: string[],
+  allowTools?: string[],
+  denyTools?: string[],
+  maxCallsPerSession?: number,
+  maxCallsPerTool?: number,
+})
+```
+
+Inspects MCP-style tool calls surfaced in LangGraph state and halts when a call hits a denied server/tool, falls outside an allow-list, or exceeds configured MCP call limits. GraphOS also emits `mcp.call` trace events for those tool calls so the dashboard can show them.
 
 ### `tokenCost()`
 

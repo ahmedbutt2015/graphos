@@ -1,4 +1,5 @@
 import type {
+  MCPToolCall,
   NodeExecution,
   NodeId,
   Policy,
@@ -8,6 +9,7 @@ import type {
   TraceListener,
 } from "@graphos-io/core";
 import { PolicyViolationError } from "./errors.js";
+import { extractMCPToolCalls } from "./policies/mcp-guard.js";
 
 type StreamResult =
   | AsyncIterable<Record<string, unknown>>
@@ -77,6 +79,25 @@ const emit = <TState>(
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error("[graphos] onTrace listener threw:", err);
+  }
+};
+
+const emitMcpCalls = <TState>(
+  listener: TraceListener<TState> | undefined,
+  execution: NodeExecution<TState>,
+  calls: MCPToolCall[]
+): void => {
+  for (const call of calls) {
+    emit(listener, {
+      kind: "mcp.call",
+      sessionId: execution.sessionId,
+      timestamp: execution.timestamp,
+      step: execution.step,
+      server: call.server,
+      tool: call.tool,
+      args: call.args,
+      source: "graph",
+    });
   }
 };
 
@@ -161,6 +182,8 @@ export const GraphOS = {
               step: execution.step,
               timestamp: execution.timestamp,
             });
+
+            emitMcpCalls(onTrace, execution, extractMCPToolCalls(execution));
 
             for (const policy of policies) {
               const decision = policy.observe(execution, ctx);

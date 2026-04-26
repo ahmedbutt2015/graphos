@@ -1,0 +1,57 @@
+{
+  "name": "@graphos-io/mcp-proxy",
+  "version": "1.0.0",
+  "description": "GraphOS MCP proxy — trace, redact, and guard Model Context Protocol tool calls",
+  "license": "MIT",
+  "author": "Ahmed Butt",
+  "homepage": "https://github.com/ahmedbutt2015/graphos#readme",
+  "bugs": "https://github.com/ahmedbutt2015/graphos/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahmedbutt2015/graphos.git",
+    "directory": "packages/mcp-proxy"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "proxy",
+    "graphos",
+    "agents",
+    "ai"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm run clean && pnpm run build && pnpm run test"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@graphos-io/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}

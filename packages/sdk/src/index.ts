@@ -8,6 +8,9 @@ export type { LoopGuardOptions, LoopGuardMode } from "./policies/loop-guard.js";
 export { BudgetGuard } from "./policies/budget-guard.js";
 export type { BudgetGuardOptions } from "./policies/budget-guard.js";
 
+export { MCPGuard, extractMCPToolCalls } from "./policies/mcp-guard.js";
+export type { MCPGuardOptions } from "./policies/mcp-guard.js";
+
 export { tokenCost, DEFAULT_PRICES } from "./policies/token-cost.js";
 export type {
   TokenCostOptions,

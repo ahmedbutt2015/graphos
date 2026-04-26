@@ -30,6 +30,7 @@ GraphOS fixes this by wrapping your `CompiledGraph` with a policy-driven interce
 ### Policy enforcement
 - **`LoopGuard`** — halt when a node revisits with identical state (`mode: "state"`) or simply visits N times (`mode: "node"`, for agents whose state grows on every iteration).
 - **`BudgetGuard`** — kill the run when cumulative cost exceeds your USD ceiling.
+- **`MCPGuard`** — allow-list / deny-list MCP servers and tools, and cap MCP call volume before an agent drifts into unsafe tool usage.
 - **`tokenCost()`** — drop-in cost extractor that reads `usage_metadata` off LangChain messages and applies a built-in price table for OpenAI + Anthropic models.
 
 ### Local dashboard
@@ -108,6 +109,7 @@ The dashboard persists every event to `~/.graphos/traces.db`. By default it keep
 | [`@graphos-io/core`](./packages/core) | Shared types (`Policy`, `NodeExecution`, `TraceEvent`) |
 | [`@graphos-io/sdk`](./packages/sdk) | `GraphOS.wrap()`, `LoopGuard`, `BudgetGuard`, `tokenCost`, transports |
 | [`@graphos-io/dashboard`](./packages/dashboard) | Next.js + React Flow dashboard with `graphos` CLI |
+| [`@graphos-io/mcp-proxy`](./packages/mcp-proxy) | Proxy MCP tool calls, emit GraphOS traces, redact payloads, and enforce MCP allow/deny rules |
 
 ---
 
@@ -153,7 +155,7 @@ Open [http://localhost:4000](http://localhost:4000).
 - [x] Session switcher + time-travel scrubber
 - [x] Per-step detail panel (messages, tool calls, usage)
 - [x] `graphos dashboard` CLI
-- [ ] MCPGuard + MCP proxy
+- [x] MCPGuard + MCP proxy
 - [ ] Python SDK parity
 
 ---

@@ -9,6 +9,18 @@ export interface NodeExecution<TState = unknown> {
   timestamp: number;
 }
 
+export interface MCPToolCall {
+  server?: string;
+  tool: string;
+  args?: unknown;
+}
+
+export interface MCPToolResult {
+  content?: unknown;
+  isError?: boolean;
+  raw?: unknown;
+}
+
 export type PolicyDecision =
   | { kind: "continue" }
   | { kind: "halt"; policy: string; reason: string; details?: unknown };
@@ -48,6 +60,37 @@ export type TraceEvent<TState = unknown> =
       state: TState;
       step: number;
       timestamp: number;
+    }
+  | {
+      kind: "mcp.call";
+      sessionId: SessionId;
+      timestamp: number;
+      step?: number;
+      server?: string;
+      tool: string;
+      args?: unknown;
+      source: "graph" | "proxy";
+    }
+  | {
+      kind: "mcp.result";
+      sessionId: SessionId;
+      timestamp: number;
+      step?: number;
+      server?: string;
+      tool: string;
+      result: MCPToolResult;
+      source: "graph" | "proxy";
+    }
+  | {
+      kind: "mcp.blocked";
+      sessionId: SessionId;
+      timestamp: number;
+      step?: number;
+      server?: string;
+      tool: string;
+      reason: string;
+      details?: unknown;
+      source: "graph" | "proxy";
     }
   | {
       kind: "policy.halt";

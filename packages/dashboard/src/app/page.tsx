@@ -38,7 +38,18 @@ export default function Home() {
     if (!latest?.events?.length) return undefined;
     for (let i = latest.events.length - 1; i >= 0; i--) {
       const ev = latest.events[i];
-      if (ev && (ev.kind === "step" || ev.kind === "policy.halt")) return ev;
+      if (
+        ev &&
+        (
+          ev.kind === "step" ||
+          ev.kind === "policy.halt" ||
+          ev.kind === "mcp.call" ||
+          ev.kind === "mcp.result" ||
+          ev.kind === "mcp.blocked"
+        )
+      ) {
+        return ev;
+      }
     }
     return latest.events[latest.events.length - 1];
   }, [mode, history.step, history.events, latest]);
