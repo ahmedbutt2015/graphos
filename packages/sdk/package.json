@@ -1,6 +1,6 @@
 {
   "name": "@graphos-io/sdk",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "GraphOS SDK — wrap your LangGraph app with policy enforcement and live telemetry",
   "license": "MIT",
   "author": "Ahmed Butt",

@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.1.0 — 2026-04-26
+
+### Added
+- **`MCPGuard`** policy — allow/deny MCP servers and tools, plus per-session and per-tool call caps. Parses qualified tool names (`mcp__server__tool`, `server/tool`, `server:tool`).
+- **`@graphos-io/mcp-proxy@1.0.0`** — new package. `createMCPProxy(upstream, options)` wraps an MCP tool implementation, applies the same allow/deny + call-cap rules before the upstream call, supports arg/result redaction, and emits the same trace events as the SDK.
+- New `TraceEvent` kinds: `mcp.call`, `mcp.result`, `mcp.blocked` (with `source: "graph" | "proxy"`).
+- New core types: `MCPToolCall`, `MCPToolResult`.
+- `extractMCPToolCalls(execution)` helper exported from `@graphos-io/sdk`.
+
+### Changed
+- `GraphOS.wrap()` now auto-emits `mcp.call` events for any step containing MCP-style tool calls, regardless of whether `MCPGuard` is in the policies list. Lets the dashboard surface MCP activity without opting in.
+
+### Dashboard
+- New detail panels for `mcp.call`, `mcp.result`, `mcp.blocked` events showing server, tool, args, and result.
+- Scrubber timeline now highlights MCP events with distinct colors (amber for call/result, red for blocked).
+- Visual assets: wordmark logo, architecture SVG, and a 12-second hero demo video are embedded in the README and docs.
+
+### Docs
+- Long-form launch post at `docs/blog/benchmark-story-graphos.md` covering the GraphOS-vs-`agents-from-scratch-ts` integration end to end.
+
 ## 1.0.0 — 2026-04-25
 
 First public release. Three packages: `@graphos-io/core`, `@graphos-io/sdk`, `@graphos-io/dashboard`.
