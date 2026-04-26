@@ -16,9 +16,7 @@
 Wrap your compiled graph in one line, get policy enforcement (loops, budgets) and a local-first live dashboard with time-travel replay. No SaaS, no signup, no telemetry leaving your machine.
 
 <p align="center">
-  <video src="https://raw.githubusercontent.com/ahmedbutt2015/graphos/main/assets/hero.mp4" autoplay loop muted playsinline width="900" poster="https://raw.githubusercontent.com/ahmedbutt2015/graphos/main/assets/architecture-v2.png">
-    <a href="./assets/hero.mp4">▶ Watch the demo — GraphOS catches a runaway agent loop (12s)</a>
-  </video>
+    <img src="./assets/recording.gif" alt="GraphOS" width="480" />
 </p>
 
 ---
