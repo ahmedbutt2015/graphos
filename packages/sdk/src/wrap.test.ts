@@ -63,6 +63,39 @@ describe("GraphOS.wrap onTrace", () => {
     expect(steps.map((s) => s.state)).toEqual([{ i: 0 }, { i: 1 }, { i: 2 }]);
   });
 
+  it("emits mcp.call events when a step contains MCP-style tool calls", async () => {
+    const events: TraceEvent[] = [];
+    const wrapped = GraphOS.wrap(
+      makeGraph([
+        {
+          agent: {
+            messages: [
+              {
+                tool_calls: [
+                  { name: "filesystem__read_file", args: { path: "/tmp/demo.txt" } },
+                ],
+              },
+            ],
+          },
+        },
+      ]),
+      { onTrace: (e) => events.push(e) }
+    );
+
+    await wrapped.invoke({});
+
+    const mcpEvents = events.filter(
+      (e): e is Extract<TraceEvent, { kind: "mcp.call" }> => e.kind === "mcp.call"
+    );
+    expect(mcpEvents).toHaveLength(1);
+    expect(mcpEvents[0]).toMatchObject({
+      server: "filesystem",
+      tool: "read_file",
+      source: "graph",
+      step: 0,
+    });
+  });
+
   it("emits policy.halt → session.end(halted) when a policy halts", async () => {
     const haltAtStep1: Policy = {
       name: "Stopper",

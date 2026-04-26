@@ -12,6 +12,9 @@ interface Props {
 const KIND_COLOR: Record<string, string> = {
   "session.start": "bg-accent",
   step: "bg-muted",
+  "mcp.call": "bg-amber-400",
+  "mcp.result": "bg-amber-300",
+  "mcp.blocked": "bg-danger",
   "policy.halt": "bg-danger",
   "session.end": "bg-accent",
 };

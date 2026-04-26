@@ -199,6 +199,9 @@ const StateKeys = ({ state }: { state: unknown }) => {
   );
 };
 
+const toolLabel = (server: string | undefined, tool: string): string =>
+  server ? `${server}/${tool}` : tool;
+
 const MessageCard = ({ msg }: { msg: Record<string, unknown> }) => {
   const role = pickRole(msg);
   const content = pickContent(msg);
@@ -303,6 +306,89 @@ const PolicyHaltDetail = ({
   </div>
 );
 
+const MCPCallDetail = ({
+  ev,
+}: {
+  ev: Extract<TraceEvent, { kind: "mcp.call" }>;
+}) => (
+  <div className="space-y-3">
+    <Header
+      title={toolLabel(ev.server, ev.tool)}
+      subtitle={
+        <>
+          mcp.call{ev.step !== undefined ? ` · step ${ev.step}` : ""} · {fmtTime(ev.timestamp)}
+        </>
+      }
+      tone="mcp"
+    />
+    <div className="text-[11px] text-muted">
+      source <span className="font-mono text-ink">{ev.source}</span>
+    </div>
+    <Label>args</Label>
+    <pre className="rounded-md bg-black/40 border border-white/5 p-2.5 text-[10px] text-muted overflow-x-auto whitespace-pre-wrap break-words">
+      {JSON.stringify(ev.args, null, 2)}
+    </pre>
+  </div>
+);
+
+const MCPResultDetail = ({
+  ev,
+}: {
+  ev: Extract<TraceEvent, { kind: "mcp.result" }>;
+}) => (
+  <div className="space-y-3">
+    <Header
+      title={toolLabel(ev.server, ev.tool)}
+      subtitle={
+        <>
+          mcp.result{ev.step !== undefined ? ` · step ${ev.step}` : ""} · {fmtTime(ev.timestamp)}
+        </>
+      }
+      tone="mcp"
+    />
+    <div className="text-[11px] text-muted">
+      source <span className="font-mono text-ink">{ev.source}</span>
+      {ev.result.isError ? <span className="ml-2 text-danger">upstream error</span> : null}
+    </div>
+    <Label>result</Label>
+    <pre className="rounded-md bg-black/40 border border-white/5 p-2.5 text-[10px] text-muted overflow-x-auto whitespace-pre-wrap break-words">
+      {JSON.stringify(ev.result, null, 2)}
+    </pre>
+  </div>
+);
+
+const MCPBlockedDetail = ({
+  ev,
+}: {
+  ev: Extract<TraceEvent, { kind: "mcp.blocked" }>;
+}) => (
+  <div className="space-y-3">
+    <Header
+      title={toolLabel(ev.server, ev.tool)}
+      subtitle={
+        <>
+          mcp.blocked{ev.step !== undefined ? ` · step ${ev.step}` : ""} · {fmtTime(ev.timestamp)}
+        </>
+      }
+      tone="halt"
+    />
+    <div className="rounded-md border border-danger/40 bg-danger/10 p-3 text-xs text-ink/90">
+      {ev.reason}
+    </div>
+    <div className="text-[11px] text-muted">
+      source <span className="font-mono text-ink">{ev.source}</span>
+    </div>
+    {ev.details !== undefined && (
+      <>
+        <Label>details</Label>
+        <pre className="rounded-md bg-black/40 border border-white/5 p-2.5 text-[10px] text-muted overflow-x-auto whitespace-pre-wrap break-words">
+          {JSON.stringify(ev.details, null, 2)}
+        </pre>
+      </>
+    )}
+  </div>
+);
+
 const SessionStartDetail = ({
   ev,
 }: {
@@ -340,12 +426,13 @@ const SessionEndDetail = ({
   </div>
 );
 
-type Tone = "step" | "halt" | "session";
+type Tone = "step" | "halt" | "session" | "mcp";
 
 const toneAccent: Record<Tone, string> = {
   step: "text-emerald-300",
   halt: "text-danger",
   session: "text-accent",
+  mcp: "text-amber-300",
 };
 
 const Header = ({
@@ -377,6 +464,12 @@ export const NodeDetail = ({ event }: Props) => (
       <StepDetail ev={event} />
     ) : event.kind === "policy.halt" ? (
       <PolicyHaltDetail ev={event} />
+    ) : event.kind === "mcp.call" ? (
+      <MCPCallDetail ev={event} />
+    ) : event.kind === "mcp.result" ? (
+      <MCPResultDetail ev={event} />
+    ) : event.kind === "mcp.blocked" ? (
+      <MCPBlockedDetail ev={event} />
     ) : event.kind === "session.start" ? (
       <SessionStartDetail ev={event} />
     ) : (

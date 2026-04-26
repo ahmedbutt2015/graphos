@@ -1,4 +1,6 @@
 export type {
+  MCPToolCall,
+  MCPToolResult,
   SessionId,
   NodeId,
   NodeExecution,
