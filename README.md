@@ -16,7 +16,7 @@
 Wrap your compiled graph in one line, get policy enforcement (loops, budgets) and a local-first live dashboard with time-travel replay. No SaaS, no signup, no telemetry leaving your machine.
 
 <p align="center">
-  <video src="https://raw.githubusercontent.com/ahmedbutt2015/graphos/main/assets/hero.mp4" autoplay loop muted playsinline width="900" poster="https://raw.githubusercontent.com/ahmedbutt2015/graphos/main/assets/architecture.png">
+  <video src="https://raw.githubusercontent.com/ahmedbutt2015/graphos/main/assets/hero.mp4" autoplay loop muted playsinline width="900" poster="https://raw.githubusercontent.com/ahmedbutt2015/graphos/main/assets/architecture-v2.png">
     <a href="./assets/hero.mp4">▶ Watch the demo — GraphOS catches a runaway agent loop (12s)</a>
   </video>
 </p>
@@ -126,7 +126,7 @@ The dashboard persists every event to `~/.graphos/traces.db`. By default it keep
 ## 🏗 Architecture
 
 <p align="center">
-  <img src="./assets/architecture.png" alt="GraphOS architecture: your code → @graphos-io/sdk → @graphos-io/dashboard, with SQLite persistence" width="900" />
+  <img src="./assets/architecture-v2.png" alt="GraphOS architecture: your code → @graphos-io/sdk → @graphos-io/dashboard, with SQLite persistence" width="900" />
 </p>
 
 The SDK runs in your process — zero network calls unless you point a transport at one. The dashboard is a separate local process started with `graphos dashboard`.
