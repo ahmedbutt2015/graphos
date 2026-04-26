@@ -16,7 +16,7 @@
 Wrap your compiled graph in one line, get policy enforcement (loops, budgets) and a local-first live dashboard with time-travel replay. No SaaS, no signup, no telemetry leaving your machine.
 
 <p align="center">
-    <img src="./assets/recording.gif" alt="GraphOS" width="480" />
+  <img src="./assets/recording.gif" alt="GraphOS Demo" width="100%" />
 </p>
 
 ---
