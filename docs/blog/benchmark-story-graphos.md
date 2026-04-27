@@ -1,17 +1,25 @@
----
-title: "We Wrapped Two Open-Source Agents in GraphOS — and the Second One Caught a Real Bug"
-description: "A field report from wrapping a TypeScript LangGraph agent and then a Python one with GraphOS — including the moment the second benchmark caught a bug 60 unit tests missed."
-tags: [ai, agents, langgraph, typescript, python, opensource]
-canonical_url: https://dev.to/ahmedbutt2015/we-wrapped-an-open-source-agent-in-graphos-and-turned-the-debugging-session-into-a-story-4de4
-cover_image: https://raw.githubusercontent.com/ahmedbutt2015/graphos/main/assets/logo-wordmark.svg
-published: false
----
+<!--
+==========================================================================
+MEDIUM POST FIELDS — copy these two fields into Medium's editor.
+
+TITLE:
+GraphOS — Loop Detection, Budget Guards, and Live Replay for LangGraph Agents in TypeScript and Python
+
+SUBTITLE (description):
+An open-source observability and policy layer for AI agents. Wrap any LangGraph graph in one line, enforce loop and budget guards, and replay every run in a local-first React Flow dashboard. Plus the field report: how wrapping a real Python LangGraph benchmark caught a bug 60 unit tests missed.
+
+SUGGESTED TAGS (Medium accepts up to 5):
+LangGraph, AI Agents, Observability, Python, Open Source
+==========================================================================
+-->
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/ahmedbutt2015/graphos/main/assets/logo-wordmark.svg" alt="GraphOS" width="420" />
 </p>
 
-# We Wrapped Two Open-Source Agents in GraphOS — and the Second One Caught a Real Bug
+# GraphOS — Loop Detection, Budget Guards, and Live Replay for LangGraph Agents in TypeScript and Python
+
+An open-source observability and policy layer for AI agents. Wrap any LangGraph graph in one line, enforce loop and budget guards, and replay every run in a local-first React Flow dashboard. Plus the field report: how wrapping a real Python LangGraph benchmark caught a bug 60 unit tests missed.
 
 > This post is a two-act story.
 >
