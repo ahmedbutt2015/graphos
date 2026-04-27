@@ -1,7 +1,7 @@
 ---
-title: "We Wrapped an Open-Source Agent in GraphOS and Turned the Debugging Session Into a Story"
-description: "A story-driven, hands-on report about taking an existing open-source LangGraph.js agent, wrapping it in GraphOS, and learning what observability actually feels like when an agent goes sideways."
-tags: [ai, agents, langgraph, typescript, opensource]
+title: "We Wrapped Two Open-Source Agents in GraphOS — and the Second One Caught a Real Bug"
+description: "A field report from wrapping a TypeScript LangGraph agent and then a Python one with GraphOS — including the moment the second benchmark caught a bug 60 unit tests missed."
+tags: [ai, agents, langgraph, typescript, python, opensource]
 canonical_url: https://dev.to/ahmedbutt2015/we-wrapped-an-open-source-agent-in-graphos-and-turned-the-debugging-session-into-a-story-4de4
 cover_image: https://raw.githubusercontent.com/ahmedbutt2015/graphos/main/assets/logo-wordmark.svg
 published: false
@@ -11,7 +11,15 @@ published: false
   <img src="https://raw.githubusercontent.com/ahmedbutt2015/graphos/main/assets/logo-wordmark.svg" alt="GraphOS" width="420" />
 </p>
 
-# We Wrapped an Open-Source Agent in GraphOS and Turned the Debugging Session Into a Story
+# We Wrapped Two Open-Source Agents in GraphOS — and the Second One Caught a Real Bug
+
+> This post is a two-act story.
+>
+> **Act I.** We took a real TypeScript LangGraph agent we did not write — `langchain-ai/agents-from-scratch-ts` — and wrapped it in GraphOS to see whether observability and policy guards survive contact with somebody else's code.
+>
+> **Act II.** We then ported the GraphOS SDK to Python and ran the same exercise against a real *Python* LangGraph agent — `langchain-ai/retrieval-agent-template`. The end-to-end run uncovered a bug that 60 unit tests had never exercised. We fixed it, shipped `graphos-io@1.0.1`, and kept going.
+>
+> The second act is the part that validates the first.
 
 There is a moment every agent project eventually reaches.
 
@@ -38,6 +46,10 @@ The better answer is the story below.
     <a href="https://raw.githubusercontent.com/ahmedbutt2015/graphos/main/assets/hero.mp4">▶ Watch GraphOS catch a runaway agent loop (12s)</a>
   </video>
 </p>
+
+---
+
+# Act I — TypeScript: `agents-from-scratch-ts`
 
 ## Before and after, in one breath
 
@@ -355,9 +367,190 @@ This part is worth slowing down for. The benchmark is not one narrow happy path.
 
 So when we say we used `agents-from-scratch-ts`, we mean we used a compact but meaningful open-source application with real behavioral coverage — not "we ran one prompt once."
 
+---
+
+# Act II — Python: `retrieval-agent-template`
+
+## The premise of the second act
+
+After Act I shipped, the obvious next question was:
+
+> If GraphOS is really a *graph-shape-agnostic* wrapper, the language of the agent should not matter.
+
+So we ported the SDK to Python and published [`graphos-io`](https://pypi.org/project/graphos-io/) with the same surface area as the TypeScript package — `wrap`, `LoopGuard`, `BudgetGuard`, `MCPGuard`, `token_cost`, `create_websocket_transport` — async-first, Pydantic-typed trace events whose field names mirror the TS ones exactly so a single dashboard ingests both languages.
+
+Then we did the same exercise we did in Act I, but in Python: we picked a real open-source LangGraph agent that we did not write, wrapped it in GraphOS, and ran it end to end.
+
+The benchmark this time:
+
+- `langchain-ai/retrieval-agent-template`: <https://github.com/langchain-ai/retrieval-agent-template>
+
+It is a small, real-world conversational retrieval graph: `generate_query` → `retrieve` → `respond`. Three nodes, real LangGraph wiring, real LangChain message types, Pydantic state classes — exactly the kind of code GraphOS is supposed to wrap unmodified.
+
+## The Python wrap is the same shape as the TypeScript one
+
+```python
+import asyncio
+from graphos_io import (
+    wrap, LoopGuard, BudgetGuard, token_cost,
+    create_websocket_transport, PolicyViolationError,
+)
+from retrieval_graph import graph
+
+async def main():
+    managed = wrap(
+        graph,
+        project_id="retrieval-agent-template",
+        policies=[
+            LoopGuard(mode="node", max_repeats=5),
+            BudgetGuard(usd_limit=1.0, cost=token_cost(fallback=0.001)),
+        ],
+        on_trace=create_websocket_transport(),
+    )
+    try:
+        result = await managed.invoke(
+            {"messages": [{"role": "user", "content": "What is GraphOS?"}]},
+            config={"configurable": {"user_id": "demo"}},
+        )
+        print(result)
+    except PolicyViolationError as err:
+        print(f"halted by {err.policy}: {err.reason}")
+
+asyncio.run(main())
+```
+
+Same wrap. Same policies. Same dashboard. Different language.
+
+The end-to-end run worked on the first try. Three trace steps streamed into the running dashboard. The session showed up as `retrieval-agent-template` next to the `agents-from-scratch` sessions from Act I, in the same UI, fed by the same WebSocket protocol.
+
+That alone would have been a clean story.
+
+But we also ran the run *with a deliberately-low BudgetGuard ceiling* — and that is where the second act earned its place.
+
+## The bug the benchmark caught
+
+We pointed a `BudgetGuard` at the run with a ceiling well below the cost of a single LLM call.
+
+The graph completed without halting.
+
+That should not happen.
+
+We sanity-checked the obvious things — the cost extractor was wired, the price table contained `gpt-4o-mini`, the budget threshold was tiny. We added more `print` statements and watched cumulative cost stay flat at `$0.0000` step after step.
+
+Then we read the cost extractor.
+
+`graphos-io@1.0.0`'s `_find_messages` walked the state for LangChain messages with this guard:
+
+```python
+def _is_object(v: Any) -> TypeGuard[dict[str, Any]]:
+    return isinstance(v, dict)
+
+# inside _find_messages:
+messages = v.get("messages")
+if isinstance(messages, list):
+    for m in messages:
+        if _is_object(m):
+            out.append(m)
+```
+
+That is a perfectly reasonable check — for LangChain *JavaScript*. In LangChain.js, an `AIMessage` serializes to a plain object, and `isinstance(m, dict)` would be the right idea translated.
+
+But LangChain *Python* ships its messages as Pydantic `BaseModel` subclasses. An `AIMessage` is not a dict. `isinstance(m, dict)` is `False`. The Pydantic message has no `.get()` method either, so even if we had reached the next step, it would have failed differently.
+
+The result: every real `AIMessage` in the graph's state was silently dropped by `_find_messages`. `token_cost()` saw zero messages. `BudgetGuard` saw `$0.00`. The guard never tripped.
+
+Worse — it never could have tripped on any real Python LangGraph agent. Not a flaky test. A guard that did not work in production.
+
+## Why the unit tests didn't catch it
+
+`graphos-io@1.0.0` shipped with 60 unit tests, including 13 dedicated to `token_cost`. They covered:
+
+- `usage_metadata` shape
+- `response_metadata.usage` shape
+- `response_metadata.tokenUsage` shape
+- Multiple messages, summed
+- Fallback prices, dated model IDs, custom price tables
+- Subgraph-state extraction
+
+Every one of them passed. Every one of them used **dict-shaped** mock messages.
+
+That is the gap. The unit tests had never exercised the path where `state["messages"]` actually contains a Pydantic `AIMessage` instance — because none of the test fixtures had ever imported `langchain-core`. The TypeScript version of the same extractor didn't have this hidden assumption baked in, so the TS test suite never had to surface it. The bug only existed in the cross-language port, and only surfaced the moment the wrap touched a *real* LangGraph Python state.
+
+This is exactly the kind of failure mode that drives the entire "wrap a real benchmark" thesis. A hand-crafted demo would have used hand-crafted dicts, just like the unit tests, and the bug would still be sitting there.
+
+## The fix
+
+A short helper that mirrors the canonicalizer GraphOS already uses for state hashing:
+
+```python
+def _coerce_message(m: Any) -> dict[str, Any] | None:
+    """Return ``m`` as a dict if it looks like a LangChain message."""
+    if isinstance(m, dict):
+        return m
+    if hasattr(m, "model_dump"):
+        dumped = m.model_dump()
+        if isinstance(dumped, dict):
+            return dumped
+    if hasattr(m, "__dict__"):
+        return {k: v for k, v in vars(m).items() if not k.startswith("_")}
+    return None
+```
+
+Used at both message-collection sites in `_find_messages`. Plain dicts pass through unchanged. Pydantic models go through `model_dump()`. Dataclass-ish objects fall back to `vars()`.
+
+Then a regression test that does what no previous test had done — uses a real `langchain_core.messages.AIMessage`:
+
+```python
+def test_handles_langchain_pydantic_aimessage() -> None:
+    pytest.importorskip("langchain_core")
+    from langchain_core.messages import AIMessage
+
+    msg = AIMessage(content="hello")
+    msg.usage_metadata = {
+        "input_tokens": 1000,
+        "output_tokens": 500,
+        "total_tokens": 1500,
+    }
+    msg.response_metadata = {"model_name": "gpt-4o-mini"}
+
+    cost = token_cost()
+    state = {"messages": [msg]}
+    assert cost(make_exec("n", state)) == pytest.approx(0.00045, abs=1e-8)
+```
+
+61 tests pass. We bumped to `graphos-io@1.0.1` and re-ran the benchmark.
+
+This time, `BudgetGuard` halted at the `respond` node with a clean policy reason:
+
+```
+[trace] session.start
+[trace] step node=generate_query step=0
+[trace] step node=retrieve step=1
+[trace] step node=respond step=2
+[trace] policy.halt policy=BudgetGuard step=2
+[trace] session.end outcome=halted
+HALTED: policy=BudgetGuard reason=session cost $X exceeded limit $Y
+```
+
+That is what we wanted to see in Act I, and it is what we wanted to see again in Act II — except the Python version had to live through a real bug to get there.
+
+## What this proves about the wider design
+
+Three things worth saying out loud, because they are easy to miss otherwise.
+
+**1. The dashboard didn't change.** Not one line. The Python SDK serializes `StepEvent.state` via Pydantic v2, which recurses into the nested `AIMessage` and produces JSON that the dashboard's per-step renderer already understood — its `pickRole` function reads `message.role` (TypeScript shape) *and* `message.type` (Python shape: `"ai"`, `"human"`, `"system"`); its `pickUsage` reads `usage_metadata` first (Python primary path) and falls back to `response_metadata.usage` and `response_metadata.tokenUsage` (TypeScript shapes). The dashboard was built polyglot-by-default. The test was whether that defensiveness survived contact with a real Python message — and it did.
+
+**2. The cross-language story is real, not aspirational.** The same dashboard renders both languages' sessions side by side. The same protocol ingests them. The `agents-from-scratch` sessions and the `retrieval-agent-template` sessions live in the same `~/.graphos/traces.db` and show up in the same session switcher. There is no Python-specific dashboard build, no separate ingest path.
+
+**3. The benchmark approach earned its keep.** This is the part the TypeScript run could not have proven on its own. A handcrafted Python demo built around dict messages would not have caught this. The unit tests we wrote in good faith did not catch this. The benchmark — a real open-source agent we did not write, with state shapes we did not control — caught it the first time we ran it. That is exactly why this approach exists.
+
+---
+
+# Closing — the lesson behind both acts
+
 ## The human lesson
 
-The benchmark is an email assistant, but the lesson is bigger than email.
+One benchmark is an email assistant. The other is a retrieval agent. Different domains, different languages, different failure modes — and the lesson is the same in both.
 
 Every agent team eventually needs answers to these questions:
 
@@ -405,13 +598,25 @@ In other words, this is not just *what GraphOS is*. It is *how GraphOS behaves w
 
 ## The files behind this story
 
-If you want to inspect the exact pieces mentioned above, start here:
+If you want to inspect the exact pieces mentioned above, start here.
 
-- GraphOS root: [`README.md`](../../README.md)
-- Companion launch reference: [`docs/blog/v1-launch.md`](./v1-launch.md)
+**Act I — TypeScript:**
+
 - Benchmark wrapper: [`benchmarks/agents-from-scratch-ts/graphos-wrap.ts`](../../benchmarks/agents-from-scratch-ts/graphos-wrap.ts)
 - Benchmark package setup: [`benchmarks/agents-from-scratch-ts/package.json`](../../benchmarks/agents-from-scratch-ts/package.json)
 - Benchmark tests: [`benchmarks/agents-from-scratch-ts/tests`](../../benchmarks/agents-from-scratch-ts/tests)
+
+**Act II — Python:**
+
+- Benchmark wrapper: [`benchmarks/retrieval-agent-template/graphos_wrap.py`](../../benchmarks/retrieval-agent-template/graphos_wrap.py)
+- The fix: [`python/src/graphos_io/policies/token_cost.py`](../../python/src/graphos_io/policies/token_cost.py)
+- The regression test: [`python/tests/test_token_cost.py`](../../python/tests/test_token_cost.py)
+- Changelog entry: [`CHANGELOG.md`](../../CHANGELOG.md) (`1.2.1 — 2026-04-28`)
+
+**Reference:**
+
+- GraphOS root: [`README.md`](../../README.md)
+- Companion launch reference: [`docs/blog/v1-launch.md`](./v1-launch.md)
 
 ## Final takeaway
 
@@ -431,14 +636,27 @@ That is the story. And that is why we used `agents-from-scratch-ts`.
 
 If you want to try the same path yourself:
 
-- Benchmark: <https://github.com/langchain-ai/agents-from-scratch-ts>
+- TypeScript benchmark: <https://github.com/langchain-ai/agents-from-scratch-ts>
+- Python benchmark: <https://github.com/langchain-ai/retrieval-agent-template>
 - GraphOS: <https://github.com/ahmedbutt2015/graphos>
 - SDK on npm: <https://www.npmjs.com/package/@graphos-io/sdk>
+- SDK on PyPI: <https://pypi.org/project/graphos-io/>
 - Dashboard on npm: <https://www.npmjs.com/package/@graphos-io/dashboard>
+
+**TypeScript:**
 
 ```bash
 npm install @graphos-io/sdk
 npx @graphos-io/dashboard graphos dashboard
 ```
 
-The next step is simple: wrap your graph, run your tests, and see what your agent was actually doing when nobody was watching.
+**Python:**
+
+```bash
+pip install graphos-io
+npx @graphos-io/dashboard graphos dashboard
+```
+
+Same dashboard either way. Same wrap shape either way.
+
+The next step is simple: wrap your graph in whichever language you actually write in, run your tests, and see what your agent was actually doing when nobody was watching.
