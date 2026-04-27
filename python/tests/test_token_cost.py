@@ -149,3 +149,26 @@ def test_custom_price_table() -> None:
 
 def test_default_prices_export_is_stable() -> None:
     assert DEFAULT_PRICES["gpt-4o"] == PriceEntry(input=2.5, output=10)
+
+
+def test_handles_langchain_pydantic_aimessage() -> None:
+    """Real LangChain Python messages are Pydantic models, not dicts.
+
+    Regression for v1.0.0 where `_find_messages` only recognized dicts and
+    silently skipped every `AIMessage`, so BudgetGuard never tripped.
+    """
+
+    pytest.importorskip("langchain_core")
+    from langchain_core.messages import AIMessage
+
+    msg = AIMessage(content="hello")
+    msg.usage_metadata = {  # type: ignore[assignment]
+        "input_tokens": 1000,
+        "output_tokens": 500,
+        "total_tokens": 1500,
+    }
+    msg.response_metadata = {"model_name": "gpt-4o-mini"}
+
+    cost = token_cost()
+    state = {"messages": [msg]}
+    assert cost(make_exec("n", state)) == pytest.approx(0.00045, abs=1e-8)

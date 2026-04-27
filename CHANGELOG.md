@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1 — 2026-04-28
+
+### Fixed
+- **`graphos-io@1.0.1`** — `token_cost()` now recognizes LangChain Python's Pydantic message classes (`AIMessage`, `HumanMessage`, …), not just plain dicts. In `1.0.0`, `_find_messages` rejected anything that wasn't a `dict`, so a real LangGraph Python agent's `state["messages"]` (which contains `AIMessage` instances) was silently skipped — `BudgetGuard` always saw `$0.00` and never halted. Coercion now matches `_canonical.py`: dict → as-is, Pydantic → `model_dump()`, dataclass-ish → `vars()`. Found while wrapping `langchain-ai/retrieval-agent-template` end-to-end as a Python-side benchmark; regression test added with a real `langchain-core` `AIMessage`.
+
 ## 1.2.0 — 2026-04-27
 
 ### Added

@@ -56,6 +56,24 @@ def _is_object(v: Any) -> TypeGuard[dict[str, Any]]:
     return isinstance(v, dict)
 
 
+def _coerce_message(m: Any) -> dict[str, Any] | None:
+    """Return ``m`` as a dict if it looks like a LangChain message.
+
+    Accepts plain dicts, Pydantic BaseModel instances (LangChain Python's
+    ``AIMessage`` / ``HumanMessage`` / ...), and dataclass-ish objects.
+    """
+
+    if isinstance(m, dict):
+        return m
+    if hasattr(m, "model_dump"):
+        dumped = m.model_dump()
+        if isinstance(dumped, dict):
+            return dumped
+    if hasattr(m, "__dict__"):
+        return {k: v for k, v in vars(m).items() if not k.startswith("_")}
+    return None
+
+
 def _num(v: Any) -> float | None:
     if isinstance(v, bool):
         return None  # bool is a subclass of int in Python; reject explicitly
@@ -123,10 +141,11 @@ def _find_messages(state: Any, max_depth: int = 4) -> list[dict[str, Any]]:
             return
         if isinstance(v, list):
             for item in v:
-                if _is_object(item) and (
-                    "usage_metadata" in item or "response_metadata" in item
+                coerced = _coerce_message(item)
+                if coerced is not None and (
+                    "usage_metadata" in coerced or "response_metadata" in coerced
                 ):
-                    out.append(item)
+                    out.append(coerced)
             return
         if not _is_object(v):
             return
@@ -137,8 +156,9 @@ def _find_messages(state: Any, max_depth: int = 4) -> list[dict[str, Any]]:
         messages = v.get("messages")
         if isinstance(messages, list):
             for m in messages:
-                if _is_object(m):
-                    out.append(m)
+                coerced = _coerce_message(m)
+                if coerced is not None:
+                    out.append(coerced)
         for key, child in v.items():
             if key == "messages":
                 continue

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "graphos-io"
-version = "1.0.0"
+version = "1.0.1"
 description = "GraphOS — local-first observability and policy guards for LangGraph (Python). Wrap your compiled graph in one line."
 readme = "README.md"
 license = "MIT"
