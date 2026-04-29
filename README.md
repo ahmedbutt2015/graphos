@@ -8,7 +8,7 @@
   <a href="https://www.npmjs.com/package/@graphos-io/sdk"><img src="https://img.shields.io/npm/v/@graphos-io/sdk?color=7cffb0&label=%40graphos-io%2Fsdk" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/@graphos-io/sdk"><img src="https://img.shields.io/npm/dm/@graphos-io/sdk?color=7cffb0" alt="npm downloads" /></a>
   <a href="https://pypi.org/project/graphos-io/"><img src="https://img.shields.io/pypi/v/graphos-io?color=7cffb0&label=graphos-io" alt="PyPI version" /></a>
-  <a href="https://pypi.org/project/graphos-io/"><img src="https://img.shields.io/pypi/dm/graphos-io?color=7cffb0" alt="PyPI downloads" /></a>
+<a href="https://pepy.tech/project/graphos-io"><img src="https://static.pepy.tech/badge/graphos-io/month" alt="PyPI downloads" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
   <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/node-%3E%3D20-7cffb0" alt="Node >= 20" /></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-%3E%3D3.10-7cffb0" alt="Python >= 3.10" /></a>
